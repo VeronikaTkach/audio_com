@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {useHistory} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -36,11 +36,11 @@ export const CatalogPage = () => {
   const paginate = (pageNumber) => dispatch(setCurrentPage(pageNumber));
 
   const handleAlbumClick = (id) => {
-    history.push(`/album/${id}`);
+    navigate.push(`/album/${id}`);
   };
 
   const handleEditClick = (id) => {
-    history.push(`/album/edit/${id}`);
+    navigate.push(`/album/edit/${id}`);
   };
 
   const handleDeleteClick = async (id) => {

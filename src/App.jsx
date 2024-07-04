@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux'
 import './App.css'
-import ThemeToggle from './assets/styles/themes/ToggleTheme'
+import ThemeToggle from './assets/styles/themes/ThemeToggle'
 import { selectTheme } from './assets/styles/themes/slice'
+import { CatalogPage } from './pages/CatalogPage/CatalogPage'
 
 function App() {
   const currentTheme = useSelector(selectTheme)
@@ -10,6 +11,7 @@ function App() {
     <div className={`App ${currentTheme}`}>
       <div>App</div>
       <ThemeToggle/>
+      <CatalogPage/>
     </div>
   )
 }
