@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
+import SearchInput from '../../components/ui/SearchInput/SearchInput';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -21,13 +22,17 @@ export const CatalogPage = () => {
     }
   }, [status, dispatch]);
 
-  const handleSearch = (e) => {
-    dispatch(setSearchTerm(e.target.value));
+  const handleSearch = (term) => {
+    dispatch(setSearchTerm(term));
   };
 
-  const filteredAlbums = albums.filter(album =>
-    album.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredAlbums = albums.filter(album => {
+    const searchWords = searchTerm.toLowerCase().split(' ');
+    return searchWords.every(word =>
+      album.title.toLowerCase().includes(word) ||
+      album.artist.toLowerCase().includes(word)
+    );
+  });
 
   const indexOfLastAlbum = currentPage * albumsPerPage;
   const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
@@ -54,15 +59,7 @@ export const CatalogPage = () => {
   return (
     <div className={s.container}>
       <div className={s.catalog__title}>Albums</div>
-      <div className={s.catalog__search}>
-        <input
-          type="text"
-          placeholder="Search albums..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className={s.catalog__search__input}
-        />
-      </div>
+      <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       <div className={s.catalog__albums__list}>
         {currentAlbums.map(album => (
           <div key={album.id} className={s.album__item}>
