@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../core/store/userSlice';
-import {Authentification} from '../Authentification';
+import { getUser, logoutUser } from '../../core/store/userSlice';
+import { Authentification } from '../Authentification';
 import s from './styles.module.scss';
 
 export const Header = () => {
   const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch]);
 
   const handleAuthClick = () => {
     setShowModal(true);
@@ -18,14 +22,14 @@ export const Header = () => {
   }
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
   }
 
   return (
     <>
       {user ? (
         <div>
-          <span>{user.userName}</span>
+          <span>{user.user_metadata.userName}</span>
           <button onClick={handleLogout}>Log out</button>
         </div>
       ) : (

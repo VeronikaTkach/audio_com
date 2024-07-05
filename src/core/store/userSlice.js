@@ -1,23 +1,32 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
-export const fetchUser = createAsyncThunk('user/fetchUser', async (email) => {
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email)
-    .single();
-  if (error && error.code !== 'PGRST116') throw error;
+export const fetchUser = createAsyncThunk('user/fetchUser', async ({ email, password }) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data.user;
+});
+
+export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password, userName }) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  }, {
+    data: { userName },
+  });
+  if (error) throw error;
+  return data.user;
+});
+
+export const getUser = createAsyncThunk('user/getUser', async () => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error) throw error;
   return user;
 });
 
-export const registerUser = createAsyncThunk('user/registerUser', async ({ email, userName }) => {
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{ email, userName }])
-    .single();
+export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
+  const { error } = await supabase.auth.signOut();
   if (error) throw error;
-  return data;
 });
 
 const userSlice = createSlice({
@@ -26,6 +35,10 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      localStorage.removeItem('user');
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -36,6 +49,7 @@ const userSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.authStatus = 'succeeded';
         state.user = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload));
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.authStatus = 'failed';
@@ -47,13 +61,22 @@ const userSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.authStatus = 'succeeded';
         state.user = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload));
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.authStatus = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload));
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        localStorage.removeItem('user');
       });
   },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, setUser } = userSlice.actions;
 export default userSlice.reducer;
