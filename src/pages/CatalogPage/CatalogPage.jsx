@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
@@ -10,6 +10,7 @@ import s from './styles.module.scss';
 export const CatalogPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [selectedAlbumId, setSelectedAlbumId] = useState(null);
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -42,11 +43,11 @@ export const CatalogPage = () => {
   const paginate = (pageNumber) => dispatch(setCurrentPage(pageNumber));
 
   const handleAlbumClick = (id) => {
-    navigate.push(`/album/${id}`);
+    setSelectedAlbumId(id);
   };
 
   const handleEditClick = (id) => {
-    navigate.push(`/album/edit/${id}`);
+    navigate(`/album/edit/${id}`);
   };
 
   const handleDeleteClick = async (id) => {
@@ -57,19 +58,26 @@ export const CatalogPage = () => {
     dispatch(deleteAlbum(id));
   };
 
+  const closeModal = () => {
+    setSelectedAlbumId(null);
+  };
+
   return (
     <div className={s.container}>
       <div className={s.catalog__title}>Albums</div>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       <div className={s.catalog__albums__list}>
-      {currentAlbums.map(album => (
-          <CardAlbum
-            key={album.id}
-            album={album}
-            onAlbumClick={handleAlbumClick}
-            onEditClick={handleEditClick}
-            onDeleteClick={handleDeleteClick}
-          />
+        {currentAlbums.map(album => (
+          <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
+            <div className={s.album__info}>
+              <div className={s.album__title} >{album.title}</div>
+              <div className={s.album__artist}>{album.artist}</div>
+            </div>
+            <div className={s.album__actions}>
+              <button onClick={() => handleEditClick(album.id)} className={s.edit__button}>Edit</button>
+              <button onClick={() => handleDeleteClick(album.id)} className={s.delete__button}>Delete</button>
+            </div>
+          </div>
         ))}
       </div>
       <div className={s.catalog__pagination}>
@@ -79,6 +87,7 @@ export const CatalogPage = () => {
             </button>
           ))}
       </div>
+      {selectedAlbumId && <CardAlbum albumId={selectedAlbumId} onClose={closeModal} />}
     </div>
   )
 }

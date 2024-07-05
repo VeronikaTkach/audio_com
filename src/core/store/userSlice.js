@@ -8,13 +8,21 @@ export const fetchUser = createAsyncThunk('user/fetchUser', async ({ email, pass
 });
 
 export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password, userName }) => {
+  console.log('Регистрация пользователя с данными:', { email, password, userName });
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-  }, {
-    data: { userName },
+    options: {
+      data: {
+        userName
+      }
+    }
   });
-  if (error) throw error;
+  if (error) {
+    console.error('Ошибка при регистрации пользователя:', error);
+    throw error;
+  }
+  console.log('Пользователь успешно зарегистрирован:', data.user);
   return data.user;
 });
 
