@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
-import SearchInput from '../../components/ui/SearchInput/SearchInput';
+import { SearchInput } from '../../components/ui/SearchInput';
+import { CardAlbum } from '../../components/ui/CardAlbum';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -61,17 +62,14 @@ export const CatalogPage = () => {
       <div className={s.catalog__title}>Albums</div>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       <div className={s.catalog__albums__list}>
-        {currentAlbums.map(album => (
-          <div key={album.id} className={s.album__item}>
-            <div onClick={() => handleAlbumClick(album.id)} className={s.album__info}>
-              <div className={s.album__title}>{album.title}</div>
-              <div className={s.album__artist}>{album.artist}</div>
-            </div>
-            <div className={s.album__actions}>
-              <button onClick={() => handleEditClick(album.id)} className={s.edit__button}>Edit</button>
-              <button onClick={() => handleDeleteClick(album.id)} className={s.delete__button}>Delete</button>
-            </div>
-          </div>
+      {currentAlbums.map(album => (
+          <CardAlbum
+            key={album.id}
+            album={album}
+            onAlbumClick={handleAlbumClick}
+            onEditClick={handleEditClick}
+            onDeleteClick={handleDeleteClick}
+          />
         ))}
       </div>
       <div className={s.catalog__pagination}>
