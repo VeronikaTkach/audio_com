@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../../supabaseClient';
 import s from './styles.module.scss';
 
-export const CardAlbum = ({ albumId, onClose }) => {
+export const CardAlbum = ({ albumId, onClose, canEdit }) => {
   const [album, setAlbum] = useState(null);
   
   useEffect(() => {
@@ -25,6 +25,14 @@ export const CardAlbum = ({ albumId, onClose }) => {
     }
   }, [albumId]);
 
+  const handleDelete = async () => {
+    await supabase
+      .from('albums')
+      .delete()
+      .eq('id', albumId);
+    onClose();
+  };
+
   if (!album) return null;
 
   return (
@@ -40,6 +48,7 @@ export const CardAlbum = ({ albumId, onClose }) => {
           <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
           <p><strong>Description:</strong> {album.description}</p>
           <p><strong>Format:</strong> {album.format}</p>
+          {canEdit && <button onClick={handleDelete} className={s.delete__button}>Delete</button>}
         </div>
       </div>
     </div>

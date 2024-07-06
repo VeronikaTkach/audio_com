@@ -7,17 +7,8 @@ export const fetchUser = createAsyncThunk('user/fetchUser', async ({ email, pass
   return data.user;
 });
 
-export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password, userName }) => {
-  console.log('Регистрация пользователя с данными:', { email, password, userName });
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        userName
-      }
-    }
-  });
+export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password }) => {
+  const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) {
     console.error('Ошибка при регистрации пользователя:', error);
     throw error;
@@ -29,7 +20,15 @@ export const registerUser = createAsyncThunk('user/registerUser', async ({ email
 export const getUser = createAsyncThunk('user/getUser', async () => {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
-  return user;
+  
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('isEditor')
+    .eq('id', user.id)
+    .single();
+
+  if (userError) throw userError;
+  return { ...user, isEditor: userData.isEditor };
 });
 
 export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
@@ -39,7 +38,18 @@ export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: { user: null, authStatus: 'idle', error: null },
+  initialState: {     
+    user: {
+    id: '1',
+    email: 'editor@example.com',
+    isEditor: true,
+    user_metadata: {
+      userName: 'Editor'
+    }
+  },
+  authStatus: 'idle',
+  error: null
+},
   reducers: {
     logout: (state) => {
       state.user = null;

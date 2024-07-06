@@ -17,6 +17,7 @@ export const CatalogPage = () => {
   const currentPage = useSelector(state => state.albums.currentPage);
   const albumsPerPage = useSelector(state => state.albums.albumsPerPage);
   const status = useSelector(state => state.albums.status);
+  const user = useSelector(state => state.user.user);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -56,6 +57,7 @@ export const CatalogPage = () => {
       .delete()
       .eq('id', id);
     dispatch(deleteAlbum(id));
+    setSelectedAlbumId(null);
   };
 
   const closeModal = () => {
@@ -73,10 +75,12 @@ export const CatalogPage = () => {
               <div className={s.album__title} >{album.title}</div>
               <div className={s.album__artist}>{album.artist}</div>
             </div>
-            <div className={s.album__actions}>
-              <button onClick={() => handleEditClick(album.id)} className={s.edit__button}>Edit</button>
-              <button onClick={() => handleDeleteClick(album.id)} className={s.delete__button}>Delete</button>
-            </div>
+            {user && user.isEditor && (
+              <div className={s.album__actions}>
+                <button onClick={(e) => { e.stopPropagation(); handleEditClick(album.id); }} className={s.edit__button}>Edit</button>
+                <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(album.id); }} className={s.delete__button}>Delete</button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -87,7 +91,13 @@ export const CatalogPage = () => {
             </button>
           ))}
       </div>
-      {selectedAlbumId && <CardAlbum albumId={selectedAlbumId} onClose={closeModal} />}
+      {selectedAlbumId && (
+        <CardAlbum
+          albumId={selectedAlbumId}
+          onClose={closeModal}
+          canEdit={user && user.isEditor}
+        />
+      )}    
     </div>
   )
 }

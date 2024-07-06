@@ -29,7 +29,7 @@ export const Header = () => {
     <>
       {user ? (
         <div>
-          <span>{user.user_metadata.userName}</span>
+          <span>{user.email} ({user.isEditor ? 'Editor' : 'User'})</span>
           <button onClick={handleLogout}>Log out</button>
         </div>
       ) : (
