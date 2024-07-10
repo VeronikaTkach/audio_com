@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
-import { CardAlbum } from '../../components/ui/CardAlbum';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -21,9 +20,21 @@ export const CatalogPage = () => {
 
   useEffect(() => {
     if (status === 'idle') {
-      dispatch(fetchAlbums());
+      dispatch(fetchAlbums({ page: currentPage, perPage: albumsPerPage }));
     }
-  }, [status, dispatch]);
+  }, [status, dispatch, currentPage, albumsPerPage]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
+        dispatch(setCurrentPage(currentPage + 1));
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [dispatch, status, currentPage]);
 
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));
@@ -37,14 +48,14 @@ export const CatalogPage = () => {
     );
   });
 
-  const indexOfLastAlbum = currentPage * albumsPerPage;
-  const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
-  const currentAlbums = filteredAlbums.slice(indexOfFirstAlbum, indexOfLastAlbum);
+  // const indexOfLastAlbum = currentPage * albumsPerPage;
+  // const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
+  // const currentAlbums = filteredAlbums.slice(indexOfFirstAlbum, indexOfLastAlbum);
 
-  const paginate = (pageNumber) => dispatch(setCurrentPage(pageNumber));
+  // const paginate = (pageNumber) => dispatch(setCurrentPage(pageNumber));
 
   const handleAlbumClick = (id) => {
-    setSelectedAlbumId(id);
+    navigate(`/album/${id}`);
   };
 
   const handleEditClick = (id) => {
@@ -60,16 +71,12 @@ export const CatalogPage = () => {
     setSelectedAlbumId(null);
   };
 
-  const closeModal = () => {
-    setSelectedAlbumId(null);
-  };
-
   return (
     <div className={s.container}>
       <div className={s.catalog__title}>Albums</div>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       <div className={s.catalog__albums__list}>
-        {currentAlbums.map(album => (
+        {filteredAlbums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
             <div className={s.album__info}>
               <div className={s.album__title} >{album.title}</div>
@@ -84,20 +91,13 @@ export const CatalogPage = () => {
           </div>
         ))}
       </div>
-      <div className={s.catalog__pagination}>
+      {/* <div className={s.catalog__pagination}>
         {Array.from({ length: Math.ceil(filteredAlbums.length / albumsPerPage) }, (_, i) => (
             <button key={i + 1} onClick={() => paginate(i + 1)} className={s.page__button}>
               {i + 1}
             </button>
           ))}
-      </div>
-      {selectedAlbumId && (
-        <CardAlbum
-          albumId={selectedAlbumId}
-          onClose={closeModal}
-          canEdit={user && user.isEditor}
-        />
-      )}    
+      </div> */}   
     </div>
   )
 }

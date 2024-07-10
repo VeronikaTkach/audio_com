@@ -1,12 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
-export const fetchAlbums = createAsyncThunk(
-  'albums/fetchAlbums',
-  async () => {
+export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page, perPage }) => {
+  const start = (page - 1) * perPage;
+  const end = start + perPage - 1;
+
     const { data, error } = await supabase
       .from('albums')
-      .select('*');
+      .select('*')
+      .range(start, end);
+
     if (error) {
       throw new Error(error.message);
     }
@@ -27,6 +30,7 @@ const albumsSlice = createSlice({
   reducers: {
     setSearchTerm(state, action) {
       state.searchTerm = action.payload;
+      state.currentPage = 1;
     },
     setCurrentPage(state, action) {
       state.currentPage = action.payload;

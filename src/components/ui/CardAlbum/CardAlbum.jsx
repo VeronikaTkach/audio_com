@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../../supabaseClient';
 import s from './styles.module.scss';
 
 export const CardAlbum = ({ albumId, onClose, canEdit }) => {
   const [album, setAlbum] = useState(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchAlbum = async () => {
@@ -25,12 +27,16 @@ export const CardAlbum = ({ albumId, onClose, canEdit }) => {
     }
   }, [albumId]);
 
-  const handleDelete = async () => {
+  const handleDeleteClick= async () => {
     await supabase
       .from('albums')
       .delete()
       .eq('id', albumId);
     onClose();
+  };
+
+  const handleEditClick = (id) => {
+    navigate(`/album/edit/${id}`);
   };
 
   if (!album) return null;
@@ -48,7 +54,8 @@ export const CardAlbum = ({ albumId, onClose, canEdit }) => {
           <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
           <p><strong>Description:</strong> {album.description}</p>
           <p><strong>Format:</strong> {album.format}</p>
-          {canEdit && <button onClick={handleDelete} className={s.delete__button}>Delete</button>}
+          {canEdit && <button onClick={handleDeleteClick} className={s.modal__button}>Edit</button>}
+          {canEdit && <button onClick={handleEditClick} className={s.modal__button}>Delete</button>}
         </div>
       </div>
     </div>
