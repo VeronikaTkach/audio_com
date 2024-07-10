@@ -4,7 +4,16 @@ import { supabase } from '../../../supabaseClient';
 export const fetchUser = createAsyncThunk('user/fetchUser', async ({ email, password }) => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
-  return data.user;
+
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('isEditor')
+    .eq('id', data.user.id)
+    .single();
+
+  if (userError) throw userError;
+
+  return { ...data.user, isEditor: userData.isEditor };
 });
 
 export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password }) => {
@@ -14,7 +23,17 @@ export const registerUser = createAsyncThunk('user/registerUser', async ({ email
     throw error;
   }
   console.log('Пользователь успешно зарегистрирован:', data.user);
-  return data.user;
+
+  const { error: userError } = await supabase
+    .from('users')
+    .insert([{ id: data.user.id, email: data.user.email, isEditor: false }]);
+
+  if (userError) {
+    console.error('Ошибка при вставке дополнительных данных:', userError);
+    throw userError;
+  }
+
+  return { ...data.user, isEditor: false };
 });
 
 export const getUser = createAsyncThunk('user/getUser', async () => {
@@ -39,16 +58,9 @@ export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
 const userSlice = createSlice({
   name: 'user',
   initialState: {     
-    user: {
-    id: '1',
-    email: 'editor@example.com',
-    isEditor: true,
-    user_metadata: {
-      userName: 'Editor'
-    }
-  },
-  authStatus: 'idle',
-  error: null
+    user: null,
+    authStatus: 'idle',
+    error: null
 },
   reducers: {
     logout: (state) => {
