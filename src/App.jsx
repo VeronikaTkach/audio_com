@@ -4,6 +4,7 @@ import ThemeToggle from './assets/styles/themes/ThemeToggle'
 import { selectTheme } from './assets/styles/themes/slice'
 import { CatalogPage } from './pages/CatalogPage/CatalogPage'
 import { AlbumPage } from './pages/AlbumPage/AlbumPage'
+import { Authentification } from './components/Authentification'
 import { Header } from '../src/components/Header'
 import './App.css'
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Navigate to="/catalog" />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/album/:albumId" element={<AlbumPage />} />
+          <Route path="/auth" element={<Authentification />} />
         </Routes>
       </div>
   );

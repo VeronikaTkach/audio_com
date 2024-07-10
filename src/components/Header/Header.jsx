@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser, logoutUser } from '../../core/store/userSlice';
-import { Authentification } from '../Authentification';
+import { useNavigate } from 'react-router-dom';
 import s from './styles.module.scss';
 
 export const Header = () => {
-  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
@@ -14,12 +14,8 @@ export const Header = () => {
   }, [dispatch]);
 
   const handleAuthClick = () => {
-    setShowModal(true);
+    navigate('/auth');
   };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  }
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -35,7 +31,6 @@ export const Header = () => {
       ) : (
         <button onClick={handleAuthClick}>Log in / Sign in</button>
       )}
-      {showModal && <Authentification onClose={handleCloseModal} />}
     </>
   )
 }
