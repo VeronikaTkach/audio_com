@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
+import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -63,18 +65,36 @@ export const CatalogPage = () => {
   };
 
   const handleDeleteClick = async (id) => {
+    setSelectedAlbumId(id);
+    setShowConfirmDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
     await supabase
       .from('albums')
       .delete()
-      .eq('id', id);
-    dispatch(deleteAlbum(id));
+      .eq('id', selectedAlbumId);
+    dispatch(deleteAlbum(selectedAlbumId));
+    setShowConfirmDelete(false);
     setSelectedAlbumId(null);
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirmDelete(false);
+    setSelectedAlbumId(null);
+  };
+
+  const handleNewAlbumClick = () => {
+    navigate('/album/new');
   };
 
   return (
     <div className={s.container}>
       <div className={s.catalog__title}>Albums</div>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
+      {user && user.isEditor && (
+        <button onClick={handleNewAlbumClick} className={s.catalog__button_new}>New Album</button>
+      )}
       <div className={s.catalog__albums__list}>
         {filteredAlbums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
@@ -91,6 +111,12 @@ export const CatalogPage = () => {
           </div>
         ))}
       </div>
+      {showConfirmDelete && (
+        <ConfirmDeleteModal 
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
+      )}
       {/* <div className={s.catalog__pagination}>
         {Array.from({ length: Math.ceil(filteredAlbums.length / albumsPerPage) }, (_, i) => (
             <button key={i + 1} onClick={() => paginate(i + 1)} className={s.page__button}>

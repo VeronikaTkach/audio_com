@@ -62,7 +62,6 @@ export const AlbumPage = () => {
 
   return (
     <div className={s.album__page}>
-      <button className={s.back__button} onClick={() => navigate('/catalog')}>Back to Catalog</button>
       <div className={s.album__info}>
         <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
         <h2>{album.title}</h2>

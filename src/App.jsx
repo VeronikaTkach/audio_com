@@ -7,6 +7,8 @@ import { AlbumPage } from './pages/AlbumPage/AlbumPage'
 import { EditPage } from './pages/EditPage/EditPage'
 import { Authentification } from './components/Authentification'
 import { Header } from '../src/components/Header'
+import { AddNewAlbumPage } from './pages/AddNewAlbumPage/AddNewAlbumPage'
+import { FavoritesPage } from './pages/FavoritesPage/FavoritesPage'
 import './App.css'
 
 function App() {
@@ -15,13 +17,14 @@ function App() {
   return (
       <div className={`App ${currentTheme}`}>
         <Header />
-        <ThemeToggle />
         <Routes>
           <Route path="/" element={<Navigate to="/catalog" />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/album/:albumId" element={<AlbumPage />} />
           <Route path="/album/edit/:albumId" element={<EditPage />} />
           <Route path="/auth" element={<Authentification />} />
+          <Route path="/album/new" element={<AddNewAlbumPage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
         </Routes>
       </div>
   );

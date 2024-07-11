@@ -1,36 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
-import { ConfirmCancelModal } from '../../components/ui/ConfirmCancelModal';
+import { fetchAlbums } from '../../core/store/albumsSlice';
 import s from './styles.module.scss';
 
-export const EditPage = () => {
-  const { albumId } = useParams();
-  const [album, setAlbum] = useState(null);
-  const [originalAlbum, setOriginalAlbum] = useState(null);
-  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+export const AddNewAlbumPage = () => {
+  const [album, setAlbum] = useState({
+    title: '',
+    artist: '',
+    description: '',
+    format: '',
+    genre: '',
+    image: '',
+    release_date: '',
+    value_of_tracks: 0
+  });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchAlbum = async () => {
-      const { data, error } = await supabase
-        .from('albums')
-        .select('*')
-        .eq('id', albumId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching album:', error);
-      } else {
-        setAlbum(data);
-        setOriginalAlbum(data);
-      }
-    };
-
-    if (albumId) {
-      fetchAlbum();
-    }
-  }, [albumId]);
+  const dispatch = useDispatch();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,55 +27,38 @@ export const EditPage = () => {
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
 
-    console.log("Sending data to Supabase:", {
-      title, artist, description, format, genre, image, release_date, value_of_tracks
-    });
+    const newAlbum = {
+      title: title || 'Untitled Album',
+      artist: artist || 'Unknown Artist',
+      description: description || 'No description',
+      format: format || 'Digital',
+      genre: genre || 'Unknown Genre',
+      image: image || 'https://example.com/default-image.jpg',
+      release_date: release_date || '2000-01-01',
+      value_of_tracks: value_of_tracks || 0
+    };
 
     const { data, error } = await supabase
       .from('albums')
-      .update({
-        title,
-        artist,
-        description,
-        format,
-        genre,
-        image,
-        release_date,
-        value_of_tracks
-      })
-      .eq('id', albumId)
-      .select('*');
+      .insert(newAlbum);
 
     if (error) {
-      console.error("Error updating album:", error);
+      console.error("Error creating album:", error);
     } else {
-      console.log("Album updated successfully:", data);
-      alert("Album updated successfully!");
-      navigate(`/album/${albumId}`);
+      console.log("New album created successfully:", data);
+      alert("New Album Created");
+      navigate('/catalog');
+      dispatch(fetchAlbums());
     }
   };
 
   const handleCancel = () => {
-    if (JSON.stringify(album) !== JSON.stringify(originalAlbum)) {
-      setShowConfirmCancel(true);
-    } else {
-      navigate('/catalog');
-    }
+    navigate(-1);
   };
-
-  const handleConfirmCancel = () => {
-    navigate('/catalog');
-  };
-
-  const handleStay = () => {
-    setShowConfirmCancel(false);
-  };
-
-  if (!album) return <div>Loading...</div>;
 
   return (
-    <div className={s.edit__page}>
-      <h2>Edit Album</h2>
+    <div className={s.add__page}>
+      <h2>New Album</h2>
       <div className={s.form__group}>
         <label>Title</label>
         <input
@@ -160,14 +130,8 @@ export const EditPage = () => {
           onChange={handleInputChange}
         />
       </div>
-      <button onClick={handleSaveChanges} className={s.edit__button}>Save Changes</button>
-      <button onClick={handleCancel} className={s.edit__button}>Cancel</button>
-      {showConfirmCancel && (
-        <ConfirmCancelModal 
-          onConfirm={handleConfirmCancel}
-          onCancel={handleStay}
-        />
-      )}
+      <button onClick={handleSaveChanges} className={s.save__button}>Ok</button>
+      <button onClick={handleCancel} className={s.cancel__button}>Cancel</button>
     </div>
   );
 };
