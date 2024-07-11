@@ -10,6 +10,7 @@ export const AlbumPage = () => {
   const { albumId } = useParams();
   const [album, setAlbum] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.user);
@@ -38,6 +39,25 @@ export const AlbumPage = () => {
     }
   }, [albumId]);
 
+  useEffect(() => {
+    const checkIfFavorite = async () => {
+      if (user && albumId) {
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('album_id', albumId)
+          .single();
+
+        if (data) {
+          setIsFavorite(true);
+        }
+      }
+    };
+
+    checkIfFavorite();
+  }, [user, albumId]);
+
   const handleDeleteClick= async () => {
     setShowConfirmDelete(true);
   };
@@ -58,6 +78,21 @@ export const AlbumPage = () => {
     navigate(`/album/edit/${albumId}`);
   };
 
+  const handleAddToFavorites = async () => {
+    if (user) {
+      const { data, error } = await supabase
+        .from('favorites')
+        .insert([{ user_id: user.id, album_id: albumId }]);
+
+      if (error) {
+        console.error('Error adding to favorites:', error);
+      } else {
+        setIsFavorite(true);
+        alert('Added to favorites!');
+      }
+    }
+  };
+
   if (!album) return <div>Loading...</div>;
 
   return (
@@ -73,9 +108,15 @@ export const AlbumPage = () => {
         <p><strong>Format:</strong> {album.format}</p>
         {user && user.isEditor && (
           <>
-            <button onClick={handleEditClick} className={s.edit__button}>Edit</button>
-            <button onClick={handleDeleteClick} className={s.delete__button}>Delete</button>
+            <button onClick={handleEditClick} className={s.album__button}>Edit</button>
+            <button onClick={handleDeleteClick} className={s.album__button}>Delete</button>
           </>
+        )}
+        {user && !user.isEditor && !isFavorite && (
+          <button onClick={handleAddToFavorites} className={s.favorites__button}>Add to Favorites</button>
+        )}
+        {user && !user.isEditor && isFavorite && (
+          <p>This album is already in your favorites.</p>
         )}
       </div>
       {showConfirmDelete && (
