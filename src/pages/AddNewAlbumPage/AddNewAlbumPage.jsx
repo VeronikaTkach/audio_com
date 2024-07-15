@@ -16,6 +16,7 @@ export const AddNewAlbumPage = () => {
     release_date: '',
     value_of_tracks: 0
   });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -42,14 +43,20 @@ export const AddNewAlbumPage = () => {
       .from('albums')
       .insert(newAlbum);
 
-    if (error) {
-      console.error("Error creating album:", error);
-    } else {
-      console.log("New album created successfully:", data);
-      alert("New Album Created");
-      navigate('/catalog');
-      dispatch(fetchAlbums());
-    }
+      if (error) {
+        if (error.code === '23505') {
+          setError('Title, description or image URL already exists.');
+        } else {
+          setError("Error creating album: " + error.message);
+        }
+        console.error("Error creating album:", error);
+      } else {
+        console.log("New album created successfully:", data);
+        alert("New Album Created");
+        dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
+          navigate('/catalog');
+        });
+      }
   };
 
   const handleCancel = () => {
@@ -132,6 +139,7 @@ export const AddNewAlbumPage = () => {
       </div>
       <button onClick={handleSaveChanges} className={s.save__button}>Ok</button>
       <button onClick={handleCancel} className={s.cancel__button}>Cancel</button>
+      {error && <div className={s.error}>{error}</div>}
     </div>
   );
 };
