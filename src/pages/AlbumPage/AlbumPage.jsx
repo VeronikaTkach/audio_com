@@ -80,9 +80,26 @@ export const AlbumPage = () => {
 
   const handleAddToFavorites = async () => {
     if (user) {
+      const { data: albumData, error: albumError } = await supabase
+        .from('albums')
+        .select('title, artist, image')
+        .eq('id', albumId)
+        .single();
+
+      if (albumError) {
+        console.error('Error fetching album details:', albumError);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('favorites')
-        .insert([{ user_id: user.id, album_id: albumId }]);
+        .insert([{ 
+          user_id: user.id, 
+          album_id: albumId,
+          title: albumData.title,
+          artist: albumData.artist,
+          image: albumData.image
+        }]);
 
       if (error) {
         console.error('Error adding to favorites:', error);
