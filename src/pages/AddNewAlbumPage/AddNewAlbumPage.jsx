@@ -65,7 +65,7 @@ export const AddNewAlbumPage = () => {
 
   return (
     <div className={s.add__page}>
-      <h2>New Album</h2>
+      <h1>New Album</h1>
       <div className={s.form__group}>
         <label>Title</label>
         <input
@@ -137,8 +137,10 @@ export const AddNewAlbumPage = () => {
           onChange={handleInputChange}
         />
       </div>
-      <button onClick={handleSaveChanges} className={s.save__button}>Ok</button>
-      <button onClick={handleCancel} className={s.cancel__button}>Cancel</button>
+      <div className={s.add__actions}>
+        <button onClick={handleSaveChanges} className={s.save__button}>Ok</button>
+        <button onClick={handleCancel} className={s.cancel__button}>Cancel</button>
+      </div>
       {error && <div className={s.error}>{error}</div>}
     </div>
   );

@@ -5,6 +5,7 @@ import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../c
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
+import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -90,10 +91,10 @@ export const CatalogPage = () => {
 
   return (
     <div className={s.container}>
-      <div className={s.catalog__title}>Albums</div>
+      <h1>Albums</h1>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       {user && user.isEditor && (
-        <button onClick={handleNewAlbumClick} className={s.catalog__button_new}>New Album</button>
+        <Button label="New Album" onClick={handleNewAlbumClick}/>
       )}
       <div className={s.catalog__albums__list}>
         {filteredAlbums.map(album => (
@@ -105,8 +106,8 @@ export const CatalogPage = () => {
             </div>
             {user && user.isEditor && (
               <div className={s.album__actions}>
-                <button onClick={(e) => { e.stopPropagation(); handleEditClick(album.id); }} className={s.edit__button}>Edit</button>
-                <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(album.id); }} className={s.delete__button}>Delete</button>
+                <Button label="Edit" onClick={(e) => { e.stopPropagation(); handleEditClick(album.id); }} className={s.album__button} />
+                <Button label="Delete" onClick={(e) => { e.stopPropagation(); handleDeleteClick(album.id); }} className={s.album__button} />
               </div>
             )}
           </div>

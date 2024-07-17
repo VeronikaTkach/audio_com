@@ -1,0 +1,29 @@
+.container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.catalog {
+  &__albums__list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+.album {
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    cursor: pointer;
+  }
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+}

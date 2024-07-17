@@ -4,13 +4,13 @@ import s from './styles.module.scss';
 
 export const SearchInput = ({ searchTerm, handleSearch }) => {
   return (
-    <div className={s.catalog__search}>
+    <div>
       <input
         type="text"
         placeholder="Search albums..."
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
-        className={s.catalog__search__input}
+        className={s.catalog__search}
       />
     </div>
   );

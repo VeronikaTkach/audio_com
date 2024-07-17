@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser, logoutUser } from '../../core/store/userSlice';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../../assets/styles/themes/ThemeToggle';
+import { Button } from '../ui/Button/Button';
 import s from './styles.module.scss';
 
 export const Header = () => {
@@ -32,18 +33,18 @@ export const Header = () => {
 
   return (
     <div className={s.header}>
-      <button onClick={handleHomeClick} className={s.header__button}>Catalog</button>
+      <Button label="Catalog" onClick={handleHomeClick}/>
       <ThemeToggle />
       {user ? (
         <div className={s.header__info}>
           {!user.isEditor && (
-            <button onClick={handleFavoritesClick} className={s.header__button}>Favorites</button>
+            <Button label="Favorites" onClick={handleFavoritesClick}/>
           )}
           <span>{user.email} ({user.isEditor ? 'Editor' : 'User'})</span>
-          <button onClick={handleLogout} className={s.header__button}>Log out</button>
+          <Button label="Log out" onClick={handleLogout}/>
         </div>
       ) : (
-        <button onClick={handleAuthClick} className={s.header__button}>Log in / Sign in</button>
+        <Button label="Log in/ Sign in" onClick={handleAuthClick}/>
       )}
     </div>
   )
