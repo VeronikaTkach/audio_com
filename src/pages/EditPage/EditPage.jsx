@@ -72,7 +72,7 @@ export const EditPage = () => {
     if (JSON.stringify(album) !== JSON.stringify(originalAlbum)) {
       setShowConfirmCancel(true);
     } else {
-      navigate('/catalog');
+      navigate(-1);
     }
   };
 

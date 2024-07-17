@@ -1,6 +1,6 @@
 .album {
   &__page {
-    padding: 20px;
+    padding: 40px;
   }
   &__info {
     display: flex;
@@ -17,11 +17,11 @@
     margin-top: 10px;
     padding: 10px 20px;
     border: none;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--button-background-color);
+    color: var(--button-text);
     cursor: pointer;
     & :hover{
-      background-color: #0056b3;
+      background-color: var(--button-hover-background-color);
     }
   } 
 }

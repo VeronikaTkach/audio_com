@@ -99,7 +99,8 @@ export const CatalogPage = () => {
         {filteredAlbums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
             <div className={s.album__info}>
-              <div className={s.album__title} >{album.title}</div>
+            <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
+            <div className={s.album__title} >{album.title}</div>
               <div className={s.album__artist}>{album.artist}</div>
             </div>
             {user && user.isEditor && (

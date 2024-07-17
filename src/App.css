@@ -2,15 +2,35 @@
   text-align: center;
 }
 
+:root {
+  --background-color: #ffffff;
+  --background-color-header: #333;
+  --text-color: #213547;
+  --button-background-color: #007bff;
+  --button-hover-background-color: #0056b3;
+}
+
 .App {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .App.light {
-  background-color: aquamarine;
+  --background-color: white;
+  --background-color-header: white;
+  --text-color: #252f3f;
+  --button-background-color: #323233;
+  --button-hover-background-color: rgba(25,25,26,.7);
+  --button-text: white;
 }
 
 .App.dark {
-  background-color: black;
+  --background-color: #252f3f;
+  --background-color-header: #252f3f;
+  --text-color: white;
+  --button-background-color: #fa6d3e;
+  --button-hover-background-color: #e9764b;
+  --button-text: #252f3f;
 }
