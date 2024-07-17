@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
+import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -66,80 +67,82 @@ export const AddNewAlbumPage = () => {
   return (
     <div className={s.add__page}>
       <h1>New Album</h1>
-      <div className={s.form__group}>
-        <label>Title</label>
-        <input
-          type="text"
-          name="title"
-          value={album.title}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Artist</label>
-        <input
-          type="text"
-          name="artist"
-          value={album.artist}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Description</label>
-        <textarea
-          name="description"
-          value={album.description}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Format</label>
-        <input
-          type="text"
-          name="format"
-          value={album.format}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Genre</label>
-        <input
-          type="text"
-          name="genre"
-          value={album.genre}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Image URL</label>
-        <input
-          type="text"
-          name="image"
-          value={album.image}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Release Date</label>
-        <input
-          type="date"
-          name="release_date"
-          value={album.release_date}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className={s.form__group}>
-        <label>Number of Tracks</label>
-        <input
-          type="number"
-          name="value_of_tracks"
-          value={album.value_of_tracks}
-          onChange={handleInputChange}
-        />
+      <div className={s.add__form}>
+        <div className={s.form__group}>
+          <label>Title</label>
+          <input
+            type="text"
+            name="title"
+            value={album.title}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Artist</label>
+          <input
+            type="text"
+            name="artist"
+            value={album.artist}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Description</label>
+          <textarea
+            name="description"
+            value={album.description}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Format</label>
+          <input
+            type="text"
+            name="format"
+            value={album.format}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Genre</label>
+          <input
+            type="text"
+            name="genre"
+            value={album.genre}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Image URL</label>
+          <input
+            type="text"
+            name="image"
+            value={album.image}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Release Date</label>
+          <input
+            type="date"
+            name="release_date"
+            value={album.release_date}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className={s.form__group}>
+          <label>Number of Tracks</label>
+          <input
+            type="number"
+            name="value_of_tracks"
+            value={album.value_of_tracks}
+            onChange={handleInputChange}
+          />
+        </div>
       </div>
       <div className={s.add__actions}>
-        <button onClick={handleSaveChanges} className={s.save__button}>Ok</button>
-        <button onClick={handleCancel} className={s.cancel__button}>Cancel</button>
+        <Button label="Ok" onClick={handleSaveChanges}/>
+        <Button label="Cancel" onClick={handleCancel}/>
       </div>
       {error && <div className={s.error}>{error}</div>}
     </div>
