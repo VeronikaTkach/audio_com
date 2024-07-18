@@ -1,0 +1,28 @@
+.edit {
+  &__page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 385px;
+    align-items: stretch;
+  }
+  &__actions {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+.form {
+  &__group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: space-between;
+  }
+}

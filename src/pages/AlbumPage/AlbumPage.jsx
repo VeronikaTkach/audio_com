@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
+import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
 export const AlbumPage = () => {
@@ -124,13 +125,13 @@ export const AlbumPage = () => {
         <p><strong>Description:</strong> {album.description}</p>
         <p><strong>Format:</strong> {album.format}</p>
         {user && user.isEditor && (
-          <>
-            <button onClick={handleEditClick} className={s.album__button}>Edit</button>
-            <button onClick={handleDeleteClick} className={s.album__button}>Delete</button>
-          </>
+          <div className={s.album__actions}>
+            <Button label="Edit" onClick={handleEditClick}/>
+            <Button label="Delete" onClick={handleDeleteClick}/>
+          </div>
         )}
         {user && !user.isEditor && !isFavorite && (
-          <button onClick={handleAddToFavorites} className={s.favorites__button}>Add to Favorites</button>
+          <Button label="Add to Favorites" onClick={handleAddToFavorites}/>
         )}
         {user && !user.isEditor && isFavorite && (
           <p>This album is already in your favorites.</p>

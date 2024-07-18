@@ -88,7 +88,8 @@ export const AddNewAlbumPage = () => {
         </div>
         <div className={s.form__group}>
           <label>Description</label>
-          <textarea
+          <input
+            type="text"
             name="description"
             value={album.description}
             onChange={handleInputChange}

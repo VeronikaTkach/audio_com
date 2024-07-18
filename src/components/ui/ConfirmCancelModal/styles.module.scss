@@ -13,9 +13,13 @@
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
   }
-  &__modal__button {
-    margin: 10px;
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
   }
 }
 
