@@ -18,6 +18,7 @@ export const AddNewAlbumPage = () => {
     value_of_tracks: 0
   });
   const [error, setError] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -26,38 +27,81 @@ export const AddNewAlbumPage = () => {
     setAlbum({ ...album, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    setAlbum({ ...album, image: file.name });
+  };
+
+  const checkIfSuchAlbumExists = async () => {
+    let response = await supabase
+      .from('albums')
+      .select("title", "artist")
+      .eq('title', album.title)
+      .eq('artist', album.artist);
+
+      return response.data.length > 0;
+  };
+
   const handleSaveChanges = async () => {
-    const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
+
+    let albumExists = await checkIfSuchAlbumExists();
+
+    if(albumExists){
+        console.error('Such album of such artist exists already');
+        setError('Such album of such artist exists already');
+        return;
+    }
+    
+    let imageUrl = album.image;
+
+    if (imageFile) {
+      const { data, error: uploadError } = await supabase.storage
+        .from('album_covers')
+        .upload(`covers/${album.artist}_${album.title}`, imageFile);
+
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        setError('Error uploading image: ' + uploadError.message);
+        return;
+      } else {
+        const { publicURL, error: urlError } = supabase.storage
+          .from('album_covers')
+          .getPublicUrl(`covers/${imageFile.name}`);
+
+        if (urlError) {
+          console.error('Error getting public URL:', urlError);
+          setError('Error getting public URL: ' + urlError.message);
+          return;
+        } else {
+          imageUrl = publicURL.publicURL;
+        }
+      }
+    }
 
     const newAlbum = {
-      title: title || 'Untitled Album',
-      artist: artist || 'Unknown Artist',
-      description: description || 'No description',
-      format: format || 'Digital',
-      genre: genre || 'Unknown Genre',
-      image: image || 'https://example.com/default-image.jpg',
-      release_date: release_date || '2000-01-01',
-      value_of_tracks: value_of_tracks || 0
+      ...album,
+      image: imageUrl || 'https://example.com/default-image.jpg'
     };
 
     const { data, error } = await supabase
       .from('albums')
       .insert(newAlbum);
 
-      if (error) {
-        if (error.code === '23505') {
-          setError('Title, description or image URL already exists.');
-        } else {
-          setError("Error creating album: " + error.message);
-        }
-        console.error("Error creating album:", error);
+    if (error) {
+      if (error.code === '23505') {
+        setError('Title, description or image URL already exists.');
       } else {
-        console.log("New album created successfully:", data);
-        alert("New Album Created");
-        dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
-          navigate('/catalog');
-        });
+        setError("Error creating album: " + error.message);
       }
+      console.error("Error creating album:", error);
+    } else {
+      console.log("New album created successfully:", data);
+      alert("New Album Created");
+      dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
+        navigate('/catalog');
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -121,9 +165,14 @@ export const AddNewAlbumPage = () => {
             value={album.image}
             onChange={handleInputChange}
           />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
         </div>
         <div className={s.form__group}>
-          <label>Release Date</label>
+          <label style={{ textAlign: 'start' }}>Release Date</label>
           <input
             type="date"
             name="release_date"
@@ -132,7 +181,7 @@ export const AddNewAlbumPage = () => {
           />
         </div>
         <div className={s.form__group}>
-          <label>Number of Tracks</label>
+          <label style={{ textAlign: 'start' }}>Number of Tracks</label>
           <input
             type="number"
             name="value_of_tracks"
