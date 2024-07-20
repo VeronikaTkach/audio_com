@@ -43,6 +43,10 @@ export const AddNewAlbumPage = () => {
       return response.data.length > 0;
   };
 
+  const createCoverPath = (artist, title) => {
+    return `covers/${artist}_${title}`;
+  }
+
   const handleSaveChanges = async () => {
 
     let albumExists = await checkIfSuchAlbumExists();
@@ -56,27 +60,28 @@ export const AddNewAlbumPage = () => {
     let imageUrl = album.image;
 
     if (imageFile) {
-      const { data, error: uploadError } = await supabase.storage
+
+      const coverPath = createCoverPath(album.artist, album.title);
+
+      const { data, error: uploadError } = await supabase
+        .storage
         .from('album_covers')
-        .upload(`covers/${album.artist}_${album.title}`, imageFile);
+        .upload(coverPath, imageFile, {
+          upsert: true
+        });
 
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
         setError('Error uploading image: ' + uploadError.message);
         return;
-      } else {
-        const { publicURL, error: urlError } = supabase.storage
-          .from('album_covers')
-          .getPublicUrl(`covers/${imageFile.name}`);
+      } 
 
-        if (urlError) {
-          console.error('Error getting public URL:', urlError);
-          setError('Error getting public URL: ' + urlError.message);
-          return;
-        } else {
-          imageUrl = publicURL.publicURL;
-        }
-      }
+      const publicURL = supabase
+        .storage
+        .from('album_covers')
+        .getPublicUrl(coverPath);
+
+      imageUrl = publicURL.data.publicUrl;    
     }
 
     const newAlbum = {
