@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchUser, registerUser } from "../../core/store/userSlice";
+import { Button } from "../ui/Button/Button";
 import s from './styles.module.scss';
 
 export const Authentification = ({ onClose }) => {
@@ -60,12 +61,16 @@ export const Authentification = ({ onClose }) => {
             Password:
             <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </label>
-          <button type="submit" disabled={authStatus === 'loading'}>
-            {isRegister ? 'Register' : 'Submit'}
-          </button>
-          <button type="button" onClick={() => setIsRegister(!isRegister)}>
-            {isRegister ? 'Switch to Log In' : 'Switch to Sign Up'}
-          </button>
+          <Button
+            type="submit"
+            disabled={authStatus === 'loading'}
+            label={isRegister ? 'Register' : 'Submit'}
+          />
+          <Button
+            type="submit"
+            onClick={() => setIsRegister(!isRegister)}
+            label={isRegister ? 'Switch to Log In' : 'Switch to Sign Up'}
+          />
         </form>
         {customError && <p className={s.modal__error}>{customError}</p>}
         {error && <p className={s.modal__error}>{error}</p>}

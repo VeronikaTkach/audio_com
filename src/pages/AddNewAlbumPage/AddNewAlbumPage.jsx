@@ -44,7 +44,7 @@ export const AddNewAlbumPage = () => {
   };
 
   const createCoverPath = (artist, title) => {
-    return `covers/${artist}_${title}`;
+    return `covers/${artist}/${title}`;
   }
 
   const handleSaveChanges = async () => {
@@ -63,7 +63,7 @@ export const AddNewAlbumPage = () => {
 
       const coverPath = createCoverPath(album.artist, album.title);
 
-      const { data, error: uploadError } = await supabase
+      const { data: uploadResponse, error: uploadError } = await supabase
         .storage
         .from('album_covers')
         .upload(coverPath, imageFile, {
@@ -76,12 +76,12 @@ export const AddNewAlbumPage = () => {
         return;
       } 
 
-      const publicURL = supabase
+      const { data: publicUrlResponse } = supabase
         .storage
         .from('album_covers')
         .getPublicUrl(coverPath);
 
-      imageUrl = publicURL.data.publicUrl;    
+      imageUrl = publicUrlResponse.publicUrl;    
     }
 
     const newAlbum = {
