@@ -163,14 +163,9 @@ export const AddNewAlbumPage = () => {
           />
         </div>
         <div className={s.form__group}>
-          <label>Image URL</label>
+          <label style={{ textAlign: 'start' }}>Image URL</label>
           <input
-            type="text"
-            name="image"
-            value={album.image}
-            onChange={handleInputChange}
-          />
-          <input
+            style={{ width: '256px' }}
             type="file"
             accept="image/*"
             onChange={handleImageChange}
@@ -188,7 +183,7 @@ export const AddNewAlbumPage = () => {
         <div className={s.form__group}>
           <label style={{ textAlign: 'start' }}>Number of Tracks</label>
           <input
-            type="number"
+            type="text"
             name="value_of_tracks"
             value={album.value_of_tracks}
             onChange={handleInputChange}
