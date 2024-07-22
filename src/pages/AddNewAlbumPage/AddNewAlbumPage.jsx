@@ -5,6 +5,7 @@ import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
 import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
+import { FaCheckCircle } from 'react-icons/fa';
 
 export const AddNewAlbumPage = () => {
   const [album, setAlbum] = useState({
@@ -19,6 +20,7 @@ export const AddNewAlbumPage = () => {
   });
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -30,6 +32,7 @@ export const AddNewAlbumPage = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
+    setFileName(file.name);
     setAlbum({ ...album, image: file.name });
   };
 
@@ -40,7 +43,7 @@ export const AddNewAlbumPage = () => {
       .eq('title', album.title)
       .eq('artist', album.artist);
 
-      return response.data.length > 0;
+    return response.data.length > 0;
   };
 
   const createCoverPath = (artist, title) => {
@@ -164,12 +167,26 @@ export const AddNewAlbumPage = () => {
         </div>
         <div className={s.form__group}>
           <label style={{ textAlign: 'start' }}>Image URL</label>
-          <input
-            style={{ width: '256px' }}
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
+          <div className={s.file__input}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              id="file-upload"
+              className={s.hidden__input}
+            />
+            <Button
+              label="Choose File"
+              onClick={() => document.getElementById('file-upload').click()}
+            />
+            {imageFile ? (
+              <span className={s.check__icon}>
+                <FaCheckCircle title={fileName} />
+              </span>
+            ) : (
+              <span>No file chosen</span>
+            )}
+          </div>
         </div>
         <div className={s.form__group}>
           <label style={{ textAlign: 'start' }}>Release Date</label>

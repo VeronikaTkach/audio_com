@@ -20,9 +20,62 @@
 
 .form {
   &__group {
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 20px;
     justify-content: space-between;
   }
 }
+
+.file {
+  &__input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 256px;
+  }
+  &_label {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+}
+
+.hidden__input {
+  display: none;
+}
+
+.check {
+  &__icon {
+    color: green;
+    font-size: 1.5rem;
+    position: relative;
+  }
+  &__icon:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    bottom: 50%;
+    transform: translateY(50%);
+    background-color: #333;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+.add__actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.error {
+  color: red;
+  margin-top: 1rem;
+}
+
