@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
-import { Button } from '../../components/ui/Button/Button';
+import { AlbumGrid } from '../../components/AlbumGrid';
+import { Button } from '../../components/ui/Button';
 import s from './styles.module.scss';
-import { FaCheckCircle } from 'react-icons/fa';
 
 export const AddNewAlbumPage = () => {
   const [album, setAlbum] = useState({
@@ -119,94 +119,14 @@ export const AddNewAlbumPage = () => {
   return (
     <div className={s.add__page}>
       <h1>New Album</h1>
-      <div className={s.add__form}>
-        <div className={s.form__group}>
-          <label>Title</label>
-          <input
-            type="text"
-            name="title"
-            value={album.title}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Artist</label>
-          <input
-            type="text"
-            name="artist"
-            value={album.artist}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Description</label>
-          <input
-            type="text"
-            name="description"
-            value={album.description}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Format</label>
-          <input
-            type="text"
-            name="format"
-            value={album.format}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Genre</label>
-          <input
-            type="text"
-            name="genre"
-            value={album.genre}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label style={{ textAlign: 'start' }}>Image URL</label>
-          <div className={s.file__input}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              id="file-upload"
-              className={s.hidden__input}
-            />
-            <Button
-              label="Choose File"
-              onClick={() => document.getElementById('file-upload').click()}
-            />
-            {imageFile ? (
-              <span className={s.check__icon}>
-                <FaCheckCircle title={fileName} />
-              </span>
-            ) : (
-              <span>No file chosen</span>
-            )}
-          </div>
-        </div>
-        <div className={s.form__group}>
-          <label style={{ textAlign: 'start' }}>Release Date</label>
-          <input
-            type="date"
-            name="release_date"
-            value={album.release_date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label style={{ textAlign: 'start' }}>Number of Tracks</label>
-          <input
-            type="text"
-            name="value_of_tracks"
-            value={album.value_of_tracks}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
+      <AlbumGrid
+        album={album}
+        handleInputChange={handleInputChange}
+        handleImageChange={handleImageChange}
+        imageFile={imageFile}
+        fileName={fileName}
+        isEdit={false}
+      />
       <div className={s.add__actions}>
         <Button label="Ok" onClick={handleSaveChanges}/>
         <Button label="Cancel" onClick={handleCancel}/>

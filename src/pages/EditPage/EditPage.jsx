@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
+import { AlbumGrid } from '../../components/AlbumGrid';
 import { ConfirmCancelModal } from '../../components/ui/ConfirmCancelModal';
-import { Button } from '../../components/ui/Button/Button';
+import { Button } from '../../components/ui/Button';
 import s from './styles.module.scss';
 
 export const EditPage = () => {
   const { albumId } = useParams();
   const [album, setAlbum] = useState(null);
   const [originalAlbum, setOriginalAlbum] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [fileName, setFileName] = useState('');
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const navigate = useNavigate();
 
@@ -36,6 +39,13 @@ export const EditPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAlbum({ ...album, [name]: value });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    setFileName(file.name);
+    setAlbum({ ...album, image: file.name });
   };
 
   const handleSaveChanges = async () => {
@@ -90,80 +100,14 @@ export const EditPage = () => {
   return (
     <div className={s.edit__page}>
       <h1>Edit Album</h1>
-      <div className={s.edit__form}>
-        <div className={s.form__group}>
-          <label>Title</label>
-          <input
-            type="text"
-            name="title"
-            value={album.title}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Artist</label>
-          <input
-            type="text"
-            name="artist"
-            value={album.artist}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Description</label>
-          <input
-            type="text"
-            name="description"
-            value={album.description}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Format</label>
-          <input
-            type="text"
-            name="format"
-            value={album.format}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Genre</label>
-          <input
-            type="text"
-            name="genre"
-            value={album.genre}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Image URL</label>
-          <input
-            type="text"
-            name="image"
-            value={album.image}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label>Release Date</label>
-          <input
-            type="date"
-            name="release_date"
-            value={album.release_date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className={s.form__group}>
-          <label style={{textAlign: 'start'}}>Number of Tracks</label>
-          <input
-            type="number"
-            name="value_of_tracks"
-            value={album.value_of_tracks}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
+      <AlbumGrid
+        album={album}
+        handleInputChange={handleInputChange}
+        handleImageChange={handleImageChange}
+        imageFile={imageFile}
+        fileName={fileName}
+        isEdit={true}
+      />
       <div className={s.edit__actions}>
         <Button label="Save Changes" onClick={handleSaveChanges}/>
         <Button label="Cancel" onClick={handleCancel}/>
