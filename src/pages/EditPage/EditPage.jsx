@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { ConfirmCancelModal } from '../../components/ui/ConfirmCancelModal';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
 export const EditPage = () => {
@@ -13,6 +13,7 @@ export const EditPage = () => {
   const [imageFile, setImageFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,12 +49,44 @@ export const EditPage = () => {
     setAlbum({ ...album, image: file.name });
   };
 
+  const createCoverPath = (artist, title) => {
+    return `covers/${artist}/${title}`;
+  };
+
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
 
     console.log("Sending data to Supabase:", {
       title, artist, description, format, genre, image, release_date, value_of_tracks
     });
+
+    if (imageFile) {
+      const coverPath = createCoverPath(album.artist, album.title);
+
+      const { data: uploadResponse, error: uploadError } = await supabase
+        .storage
+        .from('album_covers')
+        .upload(coverPath, imageFile, {
+          upsert: true,
+          transform: {
+            width: 250,
+            height: 250
+          }
+        });
+
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        setError('Error uploading image: ' + uploadError.message);
+        return;
+      } 
+
+      const { data: publicUrlResponse } = supabase
+        .storage
+        .from('album_covers')
+        .getPublicUrl(coverPath);
+
+      album.image = publicUrlResponse.publicUrl;
+    }
 
     const { data, error } = await supabase
       .from('albums')
@@ -118,6 +151,7 @@ export const EditPage = () => {
           onCancel={handleStay}
         />
       )}
+      {error && <div className={s.error}>{error}</div>}
     </div>
   );
 };

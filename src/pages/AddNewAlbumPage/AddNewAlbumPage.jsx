@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
 import { AlbumGrid } from '../../components/AlbumGrid';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -51,26 +51,28 @@ export const AddNewAlbumPage = () => {
   }
 
   const handleSaveChanges = async () => {
-
     let albumExists = await checkIfSuchAlbumExists();
 
-    if(albumExists){
-        console.error('Such album of such artist exists already');
-        setError('Such album of such artist exists already');
-        return;
+    if (albumExists) {
+      console.error('Such album of such artist exists already');
+      setError('Such album of such artist exists already');
+      return;
     }
     
     let imageUrl = album.image;
 
     if (imageFile) {
-
       const coverPath = createCoverPath(album.artist, album.title);
 
       const { data: uploadResponse, error: uploadError } = await supabase
         .storage
         .from('album_covers')
         .upload(coverPath, imageFile, {
-          upsert: true
+          upsert: true,
+          transform: {
+            width: 250,
+            height: 250
+          }
         });
 
       if (uploadError) {

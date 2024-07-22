@@ -18,18 +18,18 @@
 }
 
 .App.light {
-  --background-color: white;
-  --background-color-header: white;
+  --background-color: #fffcf2;
+  --background-color-header: #fffcf2;
   --text-color: #252f3f;
   --button-background-color: #323233;
   --button-hover-background-color: rgba(25,25,26,.7);
-  --button-text: white;
+  --button-text: #fffcf2;
 }
 
 .App.dark {
   --background-color: #252f3f;
   --background-color-header: #252f3f;
-  --text-color: white;
+  --text-color: #fffcf2;
   --button-background-color: #fa6d3e;
   --button-hover-background-color: #e9764b;
   --button-text: #252f3f;
