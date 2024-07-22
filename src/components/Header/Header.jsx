@@ -4,6 +4,7 @@ import { getUser, logoutUser } from '../../core/store/userSlice';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../../assets/styles/themes/ThemeToggle';
 import { Button } from '../ui/Button/Button';
+import { LinkLikeButton } from '../ui/LinkLikeButton';
 import s from './styles.module.scss';
 
 export const Header = () => {
@@ -27,13 +28,9 @@ export const Header = () => {
     navigate('/favorites');
   };
 
-  const handleHomeClick = () => {
-    navigate('/catalog');
-  };
-
   return (
     <div className={s.header}>
-      <Button label="Catalog" onClick={handleHomeClick}/>
+      <LinkLikeButton label="Catalog" to="/catalog" />
       <ThemeToggle />
       {user ? (
         <div className={s.header__info}>
