@@ -6,6 +6,7 @@ import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Button } from '../../components/ui/Button/Button';
+import { LinkLikeButton } from '../../components/ui/LinkLikeButton';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -85,16 +86,12 @@ export const CatalogPage = () => {
     setSelectedAlbumId(null);
   };
 
-  const handleNewAlbumClick = () => {
-    navigate('/album/new');
-  };
-
   return (
     <div className={s.container}>
       <h1>Albums</h1>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       {user && user.isEditor && (
-        <Button label="New Album" onClick={handleNewAlbumClick}/>
+        <LinkLikeButton label="New Album" to="/album/new" />
       )}
       <div className={s.catalog__albums__list}>
         {filteredAlbums.map(album => (
