@@ -32,6 +32,7 @@ export const AlbumPage = () => {
         console.error('Error fetching album:', error);
       } else {
         setAlbum(data);
+        console.log("Fetched album:", data);
       }
     };
 
@@ -59,7 +60,7 @@ export const AlbumPage = () => {
     checkIfFavorite();
   }, [user, albumId]);
 
-  const handleDeleteClick= async () => {
+  const handleDeleteClick = async () => {
     setShowConfirmDelete(true);
   };
 
@@ -112,6 +113,8 @@ export const AlbumPage = () => {
   };
 
   if (!album) return <div>Loading...</div>;
+
+  console.log("Album image URL:", album.image);
 
   return (
     <div className={s.album__page}>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
@@ -6,7 +6,6 @@ import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Button } from '../../components/ui/Button/Button';
-import { LinkLikeButton } from '../../components/ui/LinkLikeButton';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -86,19 +85,23 @@ export const CatalogPage = () => {
     setSelectedAlbumId(null);
   };
 
+  const handleNewAlbumClick = () => {
+    navigate('/album/new');
+  };
+
   return (
     <div className={s.container}>
       <h1>Albums</h1>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
       {user && user.isEditor && (
-        <LinkLikeButton label="New Album" to="/album/new" />
+        <Button label="New Album" onClick={handleNewAlbumClick}/>
       )}
       <div className={s.catalog__albums__list}>
         {filteredAlbums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
             <div className={s.album__info}>
-            <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
-            <div className={s.album__title} >{album.title}</div>
+              <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
+              <div className={s.album__title}>{album.title}</div>
               <div className={s.album__artist}>{album.artist}</div>
             </div>
             {user && user.isEditor && (

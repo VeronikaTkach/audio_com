@@ -13,7 +13,7 @@ export const EditPage = () => {
   const [imageFile, setImageFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); // Добавляем состояние для ошибки
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,25 +67,32 @@ export const EditPage = () => {
         .storage
         .from('album_covers')
         .upload(coverPath, imageFile, {
-          upsert: true,
-          transform: {
-            width: 250,
-            height: 250
-          }
+          upsert: true
         });
 
       if (uploadError) {
         console.error('Error uploading image:', uploadError);
         setError('Error uploading image: ' + uploadError.message);
         return;
-      } 
+      }
+
+      console.log("Upload response:", uploadResponse);
 
       const { data: publicUrlResponse } = supabase
         .storage
         .from('album_covers')
         .getPublicUrl(coverPath);
 
+      if (publicUrlResponse.error) {
+        console.error('Error getting public URL:', publicUrlResponse.error);
+        setError('Error getting public URL: ' + publicUrlResponse.error.message);
+        return;
+      }
+
       album.image = publicUrlResponse.publicUrl;
+
+      console.log("Public URL response:", publicUrlResponse);
+      console.log("Image URL:", album.image);
     }
 
     const { data, error } = await supabase
