@@ -119,7 +119,7 @@ export const AlbumPage = () => {
   return (
     <div className={s.album__page}>
       <div className={s.album__info}>
-        <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
+        <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
         <h2>{album.title}</h2>
         <h3>{album.artist}</h3>
         <p><strong>Genre:</strong> {album.genre}</p>

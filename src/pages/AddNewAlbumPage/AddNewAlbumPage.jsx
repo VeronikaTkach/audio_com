@@ -68,7 +68,7 @@ export const AddNewAlbumPage = () => {
         .storage
         .from('album_covers')
         .upload(coverPath, imageFile, {
-          upsert: true
+          upsert: true,
         });
 
       if (uploadError) {
