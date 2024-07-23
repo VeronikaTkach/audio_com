@@ -16,7 +16,7 @@ export const AddNewAlbumPage = () => {
     genre: '',
     image: '',
     release_date: '',
-    value_of_tracks: 0
+    value_of_tracks: ''
   });
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);

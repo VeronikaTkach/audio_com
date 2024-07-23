@@ -24,6 +24,7 @@
   --button-background-color: #323233;
   --button-hover-background-color: rgba(25,25,26,.7);
   --button-text: #fffcf2;
+  --input-color: white;
 }
 
 .App.dark {
@@ -33,4 +34,5 @@
   --button-background-color: #fa6d3e;
   --button-hover-background-color: #e9764b;
   --button-text: #252f3f;
+  --input-color: #fffcf2;
 }

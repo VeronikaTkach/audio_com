@@ -1,7 +1,9 @@
 .catalog {
   &__search {
-    border-radius: 8px;
+    border-radius: 7px;
     height: 28px;
     padding-left: 10px;
+    border: solid 1px var(--text-color);
+    color: var(--input-color);
   }
 }
