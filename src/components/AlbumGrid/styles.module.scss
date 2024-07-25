@@ -17,8 +17,9 @@
     & input {
       border-radius: 7px;
       background-color: var(--input-color);
-      height: 1.5rem;
+      height: 38px;
       border: solid 1px var(--text-color);
+      padding-left: 10px;
     }
   }
 }

@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FaCheckCircle } from 'react-icons/fa';
 import { Button } from '../ui/Button/Button';
+import { GenreDropdown } from '../ui/GenreDropDown';
 import s from './styles.module.scss';
 
 export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFile, fileName, isEdit }) => {
+  const [selectedGenres, setSelectedGenres] = useState(album.genre ? album.genre.map(g => ({ value: g, label: g })) : []);
+
+  const handleGenreChange = (selectedOptions) => {
+    setSelectedGenres(selectedOptions);
+    handleInputChange({ target: { name: 'genre', value: selectedOptions.map(option => option.value) } });
+  };
+
   return (
     <div className={s.album__form}>
       <div className={s.form__group}>
@@ -45,12 +53,7 @@ export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFi
       </div>
       <div className={s.form__group}>
         <label>Genre</label>
-        <input
-          type="text"
-          name="genre"
-          value={album.genre}
-          onChange={handleInputChange}
-        />
+        <GenreDropdown selectedGenres={selectedGenres} handleGenreChange={handleGenreChange} />
       </div>
       <div className={s.form__group}>
         <label style={{ textAlign: 'start' }}>Image URL</label>

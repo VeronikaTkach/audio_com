@@ -1,0 +1,13 @@
+.container {
+  border-radius: 7px;
+  border: solid 1px var(--text-color);
+  width: 252px;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+}
+
+.dropdown {
+  width: 100%;
+  border: none;
+}

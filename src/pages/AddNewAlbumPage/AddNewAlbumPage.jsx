@@ -5,6 +5,7 @@ import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
+import defaultCover from '../../assets/defaultCover.webp';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -98,7 +99,7 @@ export const AddNewAlbumPage = () => {
 
     const newAlbum = {
       ...album,
-      image: imageUrl || 'https://example.com/default-image.jpg'
+      image: imageUrl || defaultCover
     };
 
     const { data, error } = await supabase
