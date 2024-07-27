@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FaCheckCircle } from 'react-icons/fa';
-import { Button } from '../ui/Button/Button';
 import { GenreDropdown } from '../ui/GenreDropDown';
+import { Button } from '../ui/Button/Button';
 import s from './styles.module.scss';
 
 export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFile, fileName, isEdit }) => {
-  const [selectedGenres, setSelectedGenres] = useState(album.genre ? album.genre.map(g => ({ value: g, label: g })) : []);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+
+  useEffect(() => {
+    if (album.genre) {
+      const genresArray = typeof album.genre === 'string' ? JSON.parse(album.genre) : album.genre;
+      setSelectedGenres(genresArray.map(g => ({ value: g, label: g })));
+    }
+  }, [album.genre]);
 
   const handleGenreChange = (selectedOptions) => {
     setSelectedGenres(selectedOptions);

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { fetchAlbums } from '../../core/store/albumsSlice';
+import { fetchAllGenres } from '../../core/store/genresSlice';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
 import defaultCover from '../../assets/defaultCover.webp';
@@ -14,7 +15,7 @@ export const AddNewAlbumPage = () => {
     artist: '',
     description: '',
     format: '',
-    genre: '',
+    genre: [],
     image: '',
     release_date: '',
     value_of_tracks: ''
@@ -24,6 +25,10 @@ export const AddNewAlbumPage = () => {
   const [fileName, setFileName] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllGenres());
+  }, [dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

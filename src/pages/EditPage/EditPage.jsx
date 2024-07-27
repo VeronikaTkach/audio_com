@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { ConfirmCancelModal } from '../../components/ui/ConfirmCancelModal';
 import { Button } from '../../components/ui/Button/Button';
+import { fetchAllGenres } from '../../core/store/genresSlice';
 import s from './styles.module.scss';
 
 export const EditPage = () => {
@@ -13,8 +15,13 @@ export const EditPage = () => {
   const [imageFile, setImageFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
-  const [error, setError] = useState(null); // Добавляем состояние для ошибки
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllGenres());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchAlbum = async () => {
@@ -56,10 +63,6 @@ export const EditPage = () => {
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
 
-    console.log("Sending data to Supabase:", {
-      title, artist, description, format, genre, image, release_date, value_of_tracks
-    });
-
     if (imageFile) {
       const coverPath = createCoverPath(album.artist, album.title);
 
@@ -76,8 +79,6 @@ export const EditPage = () => {
         return;
       }
 
-      console.log("Upload response:", uploadResponse);
-
       const { data: publicUrlResponse } = supabase
         .storage
         .from('album_covers')
@@ -90,9 +91,6 @@ export const EditPage = () => {
       }
 
       album.image = publicUrlResponse.publicUrl;
-
-      console.log("Public URL response:", publicUrlResponse);
-      console.log("Image URL:", album.image);
     }
 
     const { data, error } = await supabase
@@ -107,13 +105,11 @@ export const EditPage = () => {
         release_date,
         value_of_tracks
       })
-      .eq('id', albumId)
-      .select('*');
+      .eq('id', albumId);
 
     if (error) {
       console.error("Error updating album:", error);
     } else {
-      console.log("Album updated successfully:", data);
       alert("Album updated successfully!");
       navigate(`/album/${albumId}`);
     }

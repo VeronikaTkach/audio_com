@@ -31,8 +31,11 @@ export const AlbumPage = () => {
       if (error) {
         console.error('Error fetching album:', error);
       } else {
+        if (data.genre) {
+          data.genre = JSON.parse(data.genre); // Преобразуем строку в массив
+        }
         setAlbum(data);
-        console.log("Fetched album:", data);
+        console.log("Fetched album from Supabase:", data);
       }
     };
 
@@ -122,7 +125,7 @@ export const AlbumPage = () => {
         <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
         <h2>{album.title}</h2>
         <h3>{album.artist}</h3>
-        <p><strong>Genre:</strong> {album.genre}</p>
+        <p><strong>Genre:&nbsp;</strong>{album.genre.join(', ')}</p>
         <p><strong>Release Date:</strong> {album.release_date}</p>
         <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
         <p><strong>Description:</strong> {album.description}</p>
