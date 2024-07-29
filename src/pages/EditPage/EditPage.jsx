@@ -5,7 +5,7 @@ import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { ConfirmCancelModal } from '../../components/ui/ConfirmCancelModal';
 import { Button } from '../../components/ui/Button/Button';
-import { fetchAllGenres } from '../../core/store/genresSlice';
+import { fetchGenres } from '../../core/store/genresSlice';
 import s from './styles.module.scss';
 
 export const EditPage = () => {
@@ -20,7 +20,7 @@ export const EditPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllGenres());
+    dispatch(fetchGenres());
   }, [dispatch]);
 
   useEffect(() => {

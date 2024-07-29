@@ -3,11 +3,14 @@
 }
 
 :root {
-  --background-color: #ffffff;
-  --background-color-header: #333;
-  --text-color: #213547;
-  --button-background-color: #fa6d3e;
-  --button-hover-background-color: #e9764b;
+  --background-color: #fffcf2;
+  --background-color-header: #fffcf2;
+  --text-color: #252f3f;
+  --button-background-color: #323233;
+  --button-hover-background-color: rgba(25,25,26,.7);
+  --button-text: #fffcf2;
+  --input-color: white;
+  --checkbox-color-checked: #252f3f;
 }
 
 .App {
@@ -25,6 +28,7 @@
   --button-hover-background-color: rgba(25,25,26,.7);
   --button-text: #fffcf2;
   --input-color: white;
+  --checkbox-color-checked: #252f3f;
 }
 
 .App.dark {
@@ -35,4 +39,5 @@
   --button-hover-background-color: #e9764b;
   --button-text: #252f3f;
   --input-color: #fffcf2;
+  --checkbox-color-checked: #e9764b;
 }

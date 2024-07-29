@@ -31,11 +31,15 @@ export const AlbumPage = () => {
       if (error) {
         console.error('Error fetching album:', error);
       } else {
-        if (data.genre) {
-          data.genre = JSON.parse(data.genre); // Преобразуем строку в массив
+        // Ensure that genre and format are arrays
+        if (typeof data.genre === 'string') {
+          data.genre = JSON.parse(data.genre);
+        }
+        if (typeof data.format === 'string') {
+          data.format = JSON.parse(data.format);
         }
         setAlbum(data);
-        console.log("Fetched album from Supabase:", data);
+        console.log("Fetched album:", data);
       }
     };
 
@@ -125,11 +129,11 @@ export const AlbumPage = () => {
         <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
         <h2>{album.title}</h2>
         <h3>{album.artist}</h3>
-        <p><strong>Genre:&nbsp;</strong>{album.genre.join(', ')}</p>
+        <p><strong>Genre: </strong>{album.genre.join(', ')}</p>
         <p><strong>Release Date:</strong> {album.release_date}</p>
         <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
         <p><strong>Description:</strong> {album.description}</p>
-        <p><strong>Format:</strong> {album.format}</p>
+        <p><strong>Format:</strong> {album.format.join(', ')}</p>
         {user && user.isEditor && (
           <div className={s.album__actions}>
             <Button label="Edit" onClick={handleEditClick}/>

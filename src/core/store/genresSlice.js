@@ -1,33 +1,36 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
-export const fetchAllGenres = createAsyncThunk('genres/fetchAllGenres', async () => {
-  const { data, error } = await supabase
-    .from('albums')
-    .select('genre');
+// Создаем асинхронный thunk для получения всех жанров
+export const fetchGenres = createAsyncThunk(
+  'genres/fetchGenres',
+  async () => {
+    const { data, error } = await supabase
+      .from('albums')
+      .select('genre');
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Извлекаем уникальные жанры из данных
+    const genres = new Set();
+    data.forEach(album => {
+      if (album.genre) {
+        JSON.parse(album.genre).forEach(genre => genres.add(genre));
+      }
+    });
+
+    // Возвращаем массив уникальных жанров
+    return Array.from(genres).map(genre => ({ value: genre, label: genre }));
   }
-
-  const allGenres = data.flatMap(album => album.genre);
-  const uniqueGenres = [...new Set(allGenres.map(genre => genre.toLowerCase()))].map(genre => ({ value: genre, label: genre }));
-
-  return uniqueGenres;
-});
-
-const initialState = {
-  genres: [
-    { value: 'pop', label: 'Pop' },
-    { value: 'rock', label: 'Rock' }
-  ],
-  status: 'idle',
-  error: null,
-};
+);
 
 const genresSlice = createSlice({
   name: 'genres',
-  initialState,
+  initialState: {
+    genres: []
+  },
   reducers: {
     addGenre: (state, action) => {
       state.genres.push(action.payload);
@@ -37,18 +40,9 @@ const genresSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchAllGenres.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchAllGenres.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.genres = action.payload;
-      })
-      .addCase(fetchAllGenres.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
+    builder.addCase(fetchGenres.fulfilled, (state, action) => {
+      state.genres = action.payload;
+    });
   }
 });
 

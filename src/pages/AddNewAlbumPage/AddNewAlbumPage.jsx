@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
-import { fetchAlbums } from '../../core/store/albumsSlice';
-import { fetchAllGenres } from '../../core/store/genresSlice';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
-import defaultCover from '../../assets/defaultCover.webp';
+import { fetchGenres } from '../../core/store/genresSlice';
+import { fetchAlbums } from '../../core/store/albumsSlice';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -15,7 +14,7 @@ export const AddNewAlbumPage = () => {
     artist: '',
     description: '',
     format: '',
-    genre: [],
+    genre: '',
     image: '',
     release_date: '',
     value_of_tracks: ''
@@ -27,12 +26,19 @@ export const AddNewAlbumPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllGenres());
+    dispatch(fetchGenres());
   }, [dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setAlbum({ ...album, [name]: value });
+    if (name === 'format') {
+      const formats = album.format.includes(value)
+        ? album.format.filter(f => f !== value)
+        : [...album.format, value];
+      setAlbum({ ...album, format: formats });
+    } else {
+      setAlbum({ ...album, [name]: value });
+    }
   };
 
   const handleImageChange = (e) => {
@@ -45,7 +51,7 @@ export const AddNewAlbumPage = () => {
   const checkIfSuchAlbumExists = async () => {
     let response = await supabase
       .from('albums')
-      .select("title", "artist")
+      .select('title', 'artist')
       .eq('title', album.title)
       .eq('artist', album.artist);
 
@@ -83,23 +89,23 @@ export const AddNewAlbumPage = () => {
         return;
       }
 
-      console.log("Upload response:", uploadResponse);
+      console.log('Upload response:', uploadResponse);
 
-      const { data: publicUrlResponse } = supabase
+      const { data: publicUrlResponse, error: urlError } = supabase
         .storage
         .from('album_covers')
         .getPublicUrl(coverPath);
 
-      if (publicUrlResponse.error) {
-        console.error('Error getting public URL:', publicUrlResponse.error);
-        setError('Error getting public URL: ' + publicUrlResponse.error.message);
+      if (urlError) {
+        console.error('Error getting public URL:', urlError);
+        setError('Error getting public URL: ' + urlError.message);
         return;
       }
 
       imageUrl = publicUrlResponse.publicUrl;
 
-      console.log("Public URL response:", publicUrlResponse);
-      console.log("Image URL:", imageUrl);
+      console.log('Public URL response:', publicUrlResponse);
+      console.log('Image URL:', imageUrl);
     }
 
     const newAlbum = {
@@ -115,12 +121,12 @@ export const AddNewAlbumPage = () => {
       if (error.code === '23505') {
         setError('Title, description or image URL already exists.');
       } else {
-        setError("Error creating album: " + error.message);
+        setError('Error creating album: ' + error.message);
       }
-      console.error("Error creating album:", error);
+      console.error('Error creating album:', error);
     } else {
-      console.log("New album created successfully:", data);
-      alert("New Album Created");
+      console.log('New album created successfully:', data);
+      alert('New Album Created');
       dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
         navigate('/catalog');
       });
@@ -143,8 +149,8 @@ export const AddNewAlbumPage = () => {
         isEdit={false}
       />
       <div className={s.add__actions}>
-        <Button label="Ok" onClick={handleSaveChanges}/>
-        <Button label="Cancel" onClick={handleCancel}/>
+        <Button label='Ok' onClick={handleSaveChanges} />
+        <Button label='Cancel' onClick={handleCancel} />
       </div>
       {error && <div className={s.error}>{error}</div>}
     </div>

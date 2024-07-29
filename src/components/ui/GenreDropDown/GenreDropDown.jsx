@@ -49,6 +49,20 @@ const customStyles = {
     display: 'flex',
     alignItems: 'center',
   }),
+    menu: (provided) => ({
+    ...provided,
+    backgroundColor: '#fff', // Цвет фона выпадающего списка
+    color: '#252f3f', // Цвет текста в выпадающем списке
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? '#323233' : '#fff', // Цвет фона выбранного и невыбранного элемента
+    color: state.isSelected ? '#fff' : '#252f3f', // Цвет текста выбранного и невыбранного элемента
+    '&:hover': {
+      backgroundColor: '#252f3f', // Цвет фона элемента при наведении
+      color: '#fffcf2',
+    }
+  }),
 };
 
 export const GenreDropdown = ({ selectedGenres, handleGenreChange }) => {

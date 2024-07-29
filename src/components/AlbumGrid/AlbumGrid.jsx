@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FaCheckCircle } from 'react-icons/fa';
 import { GenreDropdown } from '../ui/GenreDropDown';
 import { Button } from '../ui/Button/Button';
+import TextareaAutosize from 'react-textarea-autosize';
 import s from './styles.module.scss';
 
 export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFile, fileName, isEdit }) => {
@@ -10,7 +11,7 @@ export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFi
 
   useEffect(() => {
     if (album.genre) {
-      const genresArray = typeof album.genre === 'string' ? JSON.parse(album.genre) : album.genre;
+      const genresArray = Array.isArray(album.genre) ? album.genre : JSON.parse(album.genre);
       setSelectedGenres(genresArray.map(g => ({ value: g, label: g })));
     }
   }, [album.genre]);
@@ -24,39 +25,71 @@ export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFi
     <div className={s.album__form}>
       <div className={s.form__group}>
         <label>Title</label>
-        <input
-          type="text"
+        <TextareaAutosize
+          className={s.textArea}
           name="title"
           value={album.title}
           onChange={handleInputChange}
+          minRows={1}
+          maxRows={10}
         />
       </div>
       <div className={s.form__group}>
         <label>Artist</label>
-        <input
-          type="text"
+        <TextareaAutosize
+          className={s.textArea}
           name="artist"
           value={album.artist}
           onChange={handleInputChange}
+          minRows={1}
+          maxRows={10}
         />
       </div>
       <div className={s.form__group}>
         <label>Description</label>
-        <input
-          type="text"
+        <TextareaAutosize
+          className={s.textArea}
           name="description"
           value={album.description}
           onChange={handleInputChange}
+          minRows={1}
+          maxRows={10}
         />
       </div>
       <div className={s.form__group}>
         <label>Format</label>
-        <input
-          type="text"
-          name="format"
-          value={album.format}
-          onChange={handleInputChange}
-        />
+        <div className={s.form__group__block}>
+          <label className={s.form__group__label}>
+            <input
+              type="checkbox"
+              name="format"
+              value="Vinyl"
+              checked={album.format.includes('Vinyl')}
+              onChange={handleInputChange}
+            />
+            Vinyl
+          </label>
+          <label className={s.form__group__label}>
+            <input
+              type="checkbox"
+              name="format"
+              value="Digital"
+              checked={album.format.includes('Digital')}
+              onChange={handleInputChange}
+            />
+            Digital
+          </label>
+          <label className={s.form__group__label}>
+            <input
+              type="checkbox"
+              name="format"
+              value="CD"
+              checked={album.format.includes('CD')}
+              onChange={handleInputChange}
+            />
+            CD
+          </label>
+        </div>
       </div>
       <div className={s.form__group}>
         <label>Genre</label>
@@ -96,11 +129,13 @@ export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFi
       </div>
       <div className={s.form__group}>
         <label style={{ textAlign: 'start' }}>Number of Tracks</label>
-        <input
-          type="text"
+        <TextareaAutosize
+          className={s.textArea}
           name="value_of_tracks"
           value={album.value_of_tracks}
           onChange={handleInputChange}
+          minRows={1}
+          maxRows={10}
         />
       </div>
     </div>

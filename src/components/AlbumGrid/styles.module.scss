@@ -21,6 +21,29 @@
       border: solid 1px var(--text-color);
       padding-left: 10px;
     }
+    &__block {
+      width: 256px;
+    }
+    &__label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      & input[type='checkbox'] {
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        outline: none;
+        cursor: pointer;
+        transition: background 0.2s;
+        &:checked {
+          background: var(--checkbox-color-checked);
+          border-color: var(--checkbox-color-checked);
+        }
+      }
+    }
   }
 }
 
@@ -65,4 +88,8 @@
   }
 }
 
-
+.textArea {
+  width: 256px;
+  min-height: 38px;
+  border-radius: 4px;
+}
