@@ -1,21 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
-export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page, perPage }) => {
+export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page, perPage, searchTerm }) => {
   const start = (page - 1) * perPage;
   const end = start + perPage - 1;
+  
+  let query = supabase
+    .from('albums')
+    .select('*')
+    .range(start, end);
 
-    const { data, error } = await supabase
-      .from('albums')
-      .select('*')
-      .range(start, end);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
+  if (searchTerm) {
+    const lowercasedTerm = searchTerm.toLowerCase();
+    query = query.or(`title.ilike.%${lowercasedTerm}%,artist.ilike.%${lowercasedTerm}%`);
   }
-);
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+});
 
 const albumsSlice = createSlice({
   name: 'albums',
@@ -30,6 +36,7 @@ const albumsSlice = createSlice({
   reducers: {
     setSearchTerm(state, action) {
       state.searchTerm = action.payload;
+      state.items = [];
       state.currentPage = 1;
     },
     setCurrentPage(state, action) {
@@ -37,6 +44,11 @@ const albumsSlice = createSlice({
     },
     deleteAlbum(state, action) {
       state.items = state.items.filter(album => album.id !== action.payload);
+    },
+    resetAlbums(state) {
+      state.items = [];
+      state.status = 'idle';
+      state.currentPage = 1;
     }
   },
   extraReducers: (builder) => {
@@ -46,7 +58,11 @@ const albumsSlice = createSlice({
       })
       .addCase(fetchAlbums.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload;
+        if (state.currentPage === 1) {
+          state.items = action.payload;
+        } else {
+          state.items = [...state.items, ...action.payload];
+        }
       })
       .addCase(fetchAlbums.rejected, (state, action) => {
         state.status = 'failed';
@@ -55,6 +71,5 @@ const albumsSlice = createSlice({
   }
 });
 
-export const { setSearchTerm, setCurrentPage, deleteAlbum } = albumsSlice.actions;
-
+export const { setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } = albumsSlice.actions;
 export default albumsSlice.reducer;

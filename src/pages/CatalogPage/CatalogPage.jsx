@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum } from '../../core/store/albumsSlice';
+import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
@@ -22,40 +22,26 @@ export const CatalogPage = () => {
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchAlbums({ page: currentPage, perPage: albumsPerPage }));
-    }
-  }, [status, dispatch, currentPage, albumsPerPage]);
+    dispatch(resetAlbums());
+    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm }));
+  }, [dispatch, searchTerm, albumsPerPage]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
         dispatch(setCurrentPage(currentPage + 1));
+        dispatch(fetchAlbums({ page: currentPage + 1, perPage: albumsPerPage, searchTerm }));
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [dispatch, status, currentPage]);
+  }, [dispatch, status, currentPage, albumsPerPage, searchTerm]);
 
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));
   };
-
-  const filteredAlbums = albums.filter(album => {
-    const searchWords = searchTerm.toLowerCase().split(' ');
-    return searchWords.every(word =>
-      album.title.toLowerCase().includes(word) ||
-      album.artist.toLowerCase().includes(word)
-    );
-  });
-
-  // const indexOfLastAlbum = currentPage * albumsPerPage;
-  // const indexOfFirstAlbum = indexOfLastAlbum - albumsPerPage;
-  // const currentAlbums = filteredAlbums.slice(indexOfFirstAlbum, indexOfLastAlbum);
-
-  // const paginate = (pageNumber) => dispatch(setCurrentPage(pageNumber));
 
   const handleAlbumClick = (id) => {
     navigate(`/album/${id}`);
@@ -97,7 +83,7 @@ export const CatalogPage = () => {
         <Button label="New Album" onClick={handleNewAlbumClick}/>
       )}
       <div className={s.catalog__albums__list}>
-        {filteredAlbums.map(album => (
+        {albums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
             <div className={s.album__info}>
               <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
@@ -119,13 +105,6 @@ export const CatalogPage = () => {
           onCancel={handleCancelDelete}
         />
       )}
-      {/* <div className={s.catalog__pagination}>
-        {Array.from({ length: Math.ceil(filteredAlbums.length / albumsPerPage) }, (_, i) => (
-            <button key={i + 1} onClick={() => paginate(i + 1)} className={s.page__button}>
-              {i + 1}
-            </button>
-          ))}
-      </div> */}   
     </div>
   )
 }

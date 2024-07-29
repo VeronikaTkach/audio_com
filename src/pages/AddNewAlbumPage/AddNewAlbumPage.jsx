@@ -5,7 +5,7 @@ import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
 import { fetchGenres } from '../../core/store/genresSlice';
-import { fetchAlbums } from '../../core/store/albumsSlice';
+import { fetchAlbums, resetAlbums } from '../../core/store/albumsSlice';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -127,6 +127,7 @@ export const AddNewAlbumPage = () => {
     } else {
       console.log('New album created successfully:', data);
       alert('New Album Created');
+      dispatch(resetAlbums());
       dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
         navigate('/catalog');
       });
