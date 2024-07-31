@@ -31,7 +31,6 @@ export const AlbumPage = () => {
       if (error) {
         console.error('Error fetching album:', error);
       } else {
-        // Ensure that genre and format are arrays
         if (typeof data.genre === 'string') {
           data.genre = JSON.parse(data.genre);
         }
@@ -125,27 +124,29 @@ export const AlbumPage = () => {
 
   return (
     <div className={s.album__page}>
-      <div className={s.album__info}>
+      <div className={s.album__content}>
         <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
-        <h2>{album.title}</h2>
-        <h3>{album.artist}</h3>
-        <p><strong>Genre: </strong>{album.genre.join(', ')}</p>
-        <p><strong>Release Date:</strong> {album.release_date}</p>
-        <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
-        <p><strong>Description:</strong> {album.description}</p>
-        <p><strong>Format:</strong> {album.format.join(', ')}</p>
-        {user && user.isEditor && (
-          <div className={s.album__actions}>
-            <Button label="Edit" onClick={handleEditClick}/>
-            <Button label="Delete" onClick={handleDeleteClick}/>
-          </div>
-        )}
-        {user && !user.isEditor && !isFavorite && (
-          <Button label="Add to Favorites" onClick={handleAddToFavorites}/>
-        )}
-        {user && !user.isEditor && isFavorite && (
-          <p>This album is already in your favorites.</p>
-        )}
+        <div className={s.album__details}>
+          <h2>{album.title}</h2>
+          <h3>{album.artist}</h3>
+          <p><strong>Genre: </strong>{album.genre.join(', ')}</p>
+          <p><strong>Release Date:</strong> {album.release_date}</p>
+          <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
+          <p><strong>Description:</strong> {album.description}</p>
+          <p><strong>Format:</strong> {album.format.join(', ')}</p>
+          {user && user.isEditor && (
+            <div className={s.album__actions}>
+              <Button label="Edit" onClick={handleEditClick}/>
+              <Button label="Delete" onClick={handleDeleteClick}/>
+            </div>
+          )}
+          {user && !user.isEditor && !isFavorite && (
+            <Button label="Add to Favorites" onClick={handleAddToFavorites}/>
+          )}
+          {user && !user.isEditor && isFavorite && (
+            <p>This album is already in your favorites.</p>
+          )}
+        </div>
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal 

@@ -1,15 +1,24 @@
 .album {
   &__page {
-    padding: 40px;
-  }
-  &__info {
+    padding: 80px;
     display: flex;
-    flex-direction: column;
+    justify-content: flex-start;
+  }
+  &__content {
+    display: flex;
+    gap: 10vw;
     align-items: center;
   }
   &__image {
-    width: 250px;
-    height: 250px;
+    width: 600px;
+    height: 600px;
+    object-fit: cover;
+  }
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
   }
   &__actions {
     display: flex;

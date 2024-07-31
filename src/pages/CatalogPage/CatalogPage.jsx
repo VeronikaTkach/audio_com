@@ -85,10 +85,10 @@ export const CatalogPage = () => {
       <div className={s.catalog__albums__list}>
         {albums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
+            <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
             <div className={s.album__info}>
-              <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
-              <div className={s.album__title}>{album.title}</div>
               <div className={s.album__artist}>{album.artist}</div>
+              <div className={s.album__title}>{album.title}</div>
             </div>
             {user && user.isEditor && (
               <div className={s.album__actions}>
