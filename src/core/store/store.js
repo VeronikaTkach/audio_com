@@ -3,6 +3,7 @@ import themeReducer from '../../assets/styles/themes/slice';
 import albumsReducer from '../store/albumsSlice';
 import userSlice from '../store/userSlice';
 import genresReducer from './genresSlice';
+import yearsReducer from './yearsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     albums: albumsReducer,
     user: userSlice,
     genres: genresReducer,
+    years: yearsReducer,
   },
 });
 

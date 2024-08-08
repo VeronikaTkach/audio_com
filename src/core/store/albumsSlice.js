@@ -1,25 +1,43 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
-export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page, perPage, searchTerm }) => {
+export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page, perPage, searchTerm, genre, year }) => {
   const start = (page - 1) * perPage;
   const end = start + perPage - 1;
-  
+
+  console.log('Fetching albums with params:', { page, perPage, searchTerm, genre, year });
+
   let query = supabase
     .from('albums')
     .select('*')
     .range(start, end);
 
+  // Apply search term filter if provided
   if (searchTerm) {
-    const lowercasedTerm = searchTerm.toLowerCase();
-    query = query.or(`title.ilike.%${lowercasedTerm}%,artist.ilike.%${lowercasedTerm}%`);
+    query = query.or(`title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`);
+  }
+
+  // Apply genre filter if provided
+  if (genre) {
+    query = query.filter('genre', 'cs', `{${genre}}`); // Используем оператор `cs` для массива жанров
+  }
+
+  // Apply year filter if provided
+  if (year) {
+    const startDate = `${year}-01-01`;
+    const endDate = `${year}-12-31`;
+    query = query.gte('release_date', startDate).lte('release_date', endDate);
   }
 
   const { data, error } = await query;
 
   if (error) {
+    console.error('Error fetching albums:', error.message);
     throw new Error(error.message);
   }
+  
+  console.log('Fetched albums:', data);
+
   return data;
 });
 
@@ -36,7 +54,6 @@ const albumsSlice = createSlice({
   reducers: {
     setSearchTerm(state, action) {
       state.searchTerm = action.payload;
-      state.items = [];
       state.currentPage = 1;
     },
     setCurrentPage(state, action) {
@@ -48,7 +65,6 @@ const albumsSlice = createSlice({
     resetAlbums(state) {
       state.items = [];
       state.status = 'idle';
-      state.currentPage = 1;
     }
   },
   extraReducers: (builder) => {
@@ -58,6 +74,7 @@ const albumsSlice = createSlice({
       })
       .addCase(fetchAlbums.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        // Здесь заменяем старый список новым, чтобы избежать дублирования
         if (state.currentPage === 1) {
           state.items = action.payload;
         } else {
@@ -72,4 +89,5 @@ const albumsSlice = createSlice({
 });
 
 export const { setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } = albumsSlice.actions;
+
 export default albumsSlice.reducer;

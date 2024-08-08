@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchGenres } from '../../../core/store/genresSlice';
+import { fetchYears } from '../../../core/store/yearsSlice'; // Добавляем импорт для получения годов
 import CreatableSelect from 'react-select/creatable';
-import { addGenre } from '../../../core/store/genresSlice';
 import s from './styles.module.scss';
 
 const customStyles = {
@@ -17,7 +17,7 @@ const customStyles = {
     minHeight: 38,
     padding: '0 8px',
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   }),
   input: (provided) => ({
     ...provided,
@@ -65,34 +65,46 @@ const customStyles = {
   }),
 };
 
-export const GenreDropdown = ({ selectedGenres, handleGenreChange }) => {
+export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handleYearChange }) => {
   const dispatch = useDispatch();
-  const genres = useSelector(state => state.genres.genres);
+  const { genres, status: genreStatus } = useSelector(state => state.genres);
+  const { years, status: yearStatus } = useSelector(state => state.years); // Добавляем состояние для годов
 
-  const handleCreate = (inputValue) => {
-    const newOption = { value: inputValue.toLowerCase(), label: inputValue };
-    dispatch(addGenre(newOption));
-  };
+  useEffect(() => {
+    if (genreStatus === 'idle') {
+      dispatch(fetchGenres());
+    }
+    if (yearStatus === 'idle') {
+      dispatch(fetchYears()); // Диспатчим получение годов
+    }
+  }, [genreStatus, yearStatus, dispatch]);
+
+  if (genreStatus === 'loading' || yearStatus === 'loading') {
+    return <div>Loading filters...</div>;
+  }
+
+  if (genreStatus === 'failed' || yearStatus === 'failed') {
+    return <div>Error loading filters.</div>;
+  }
 
   return (
-    <div className={s.container}>
+    <div className={s.filters}>
       <CreatableSelect
-        isMulti
-        name="genres"
+        value={selectedGenre}
+        onChange={handleGenreChange}
         options={genres}
         className={s.dropdown}
-        classNamePrefix="select"
-        onChange={handleGenreChange}
-        onCreateOption={handleCreate}
-        value={selectedGenres}
-        placeholder="Select genres..."
+        placeholder="Select genre..."
+        styles={customStyles}
+      />
+      <CreatableSelect
+        value={selectedYear}
+        onChange={handleYearChange}
+        options={years} // Используем данные из состояния для годов
+        className={s.dropdown}
+        placeholder="Select year..."
         styles={customStyles}
       />
     </div>
   );
-};
-
-GenreDropdown.propTypes = {
-  selectedGenres: PropTypes.array.isRequired,
-  handleGenreChange: PropTypes.func.isRequired
 };

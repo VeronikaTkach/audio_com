@@ -5,6 +5,7 @@ import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } 
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
+import { Filters } from '../../components/ui/Filters';
 import { Button } from '../../components/ui/Button/Button';
 import s from './styles.module.scss';
 
@@ -13,6 +14,8 @@ export const CatalogPage = () => {
   const navigate = useNavigate();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -23,24 +26,50 @@ export const CatalogPage = () => {
 
   useEffect(() => {
     dispatch(resetAlbums());
-    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm }));
-  }, [dispatch, searchTerm, albumsPerPage]);
+    console.log('Dispatching fetchAlbums on mount with params:', { page: 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value });
+    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
+  }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
+        console.log('Dispatching fetchAlbums on scroll with params:', { page: currentPage + 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value });
         dispatch(setCurrentPage(currentPage + 1));
-        dispatch(fetchAlbums({ page: currentPage + 1, perPage: albumsPerPage, searchTerm }));
+        dispatch(fetchAlbums({ page: currentPage + 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [dispatch, status, currentPage, albumsPerPage, searchTerm]);
+  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear]);
 
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));
+  };
+
+  const handleGenreChange = (selectedOption) => {
+    setSelectedGenre(selectedOption);
+    dispatch(resetAlbums());
+    dispatch(fetchAlbums({ 
+      page: 1, 
+      perPage: albumsPerPage, 
+      searchTerm, 
+      genre: selectedOption?.value, 
+      year: selectedYear?.value 
+    }));
+  };
+  
+  const handleYearChange = (selectedOption) => {
+    setSelectedYear(selectedOption);
+    dispatch(resetAlbums());
+    dispatch(fetchAlbums({ 
+      page: 1, 
+      perPage: albumsPerPage, 
+      searchTerm, 
+      genre: selectedGenre?.value, 
+      year: selectedOption?.value 
+    }));
   };
 
   const handleAlbumClick = (id) => {
@@ -79,16 +108,24 @@ export const CatalogPage = () => {
     <div className={s.container}>
       <h1>Albums</h1>
       <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
+      <Filters
+        selectedGenre={selectedGenre}
+        handleGenreChange={handleGenreChange}
+        selectedYear={selectedYear}
+        handleYearChange={handleYearChange}
+      />
       {user && user.isEditor && (
-        <Button label="New Album" onClick={handleNewAlbumClick}/>
+        <Button label="New Album" onClick={handleNewAlbumClick} />
       )}
       <div className={s.catalog__albums__list}>
         {albums.map(album => (
           <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
-            <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
             <div className={s.album__info}>
-              <div className={s.album__artist}>{album.artist}</div>
-              <div className={s.album__title}>{album.title}</div>
+              <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
+              <div className={s.album__details}>
+                <div className={s.album__artist}>{album.artist}</div>
+                <div className={s.album__title}>{album.title}</div>
+              </div>
             </div>
             {user && user.isEditor && (
               <div className={s.album__actions}>
@@ -100,7 +137,7 @@ export const CatalogPage = () => {
         ))}
       </div>
       {showConfirmDelete && (
-        <ConfirmDeleteModal 
+        <ConfirmDeleteModal
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
         />
