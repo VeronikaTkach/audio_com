@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGenres } from '../../../core/store/genresSlice';
-import { fetchYears } from '../../../core/store/yearsSlice'; // Добавляем импорт для получения годов
+import { fetchYears } from '../../../core/store/yearsSlice';
 import CreatableSelect from 'react-select/creatable';
 import s from './styles.module.scss';
 
@@ -65,17 +65,17 @@ const customStyles = {
   }),
 };
 
-export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handleYearChange }) => {
+export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handleYearChange, resetAllFilters }) => {
   const dispatch = useDispatch();
   const { genres, status: genreStatus } = useSelector(state => state.genres);
-  const { years, status: yearStatus } = useSelector(state => state.years); // Добавляем состояние для годов
+  const { years, status: yearStatus } = useSelector(state => state.years);
 
   useEffect(() => {
     if (genreStatus === 'idle') {
       dispatch(fetchGenres());
     }
     if (yearStatus === 'idle') {
-      dispatch(fetchYears()); // Диспатчим получение годов
+      dispatch(fetchYears());
     }
   }, [genreStatus, yearStatus, dispatch]);
 
@@ -89,22 +89,47 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
 
   return (
     <div className={s.filters}>
-      <CreatableSelect
-        value={selectedGenre}
-        onChange={handleGenreChange}
-        options={genres}
-        className={s.dropdown}
-        placeholder="Select genre..."
-        styles={customStyles}
-      />
-      <CreatableSelect
-        value={selectedYear}
-        onChange={handleYearChange}
-        options={years} // Используем данные из состояния для годов
-        className={s.dropdown}
-        placeholder="Select year..."
-        styles={customStyles}
-      />
+      <div className={s.filterGroup}>
+        <CreatableSelect
+          value={selectedGenre}
+          onChange={handleGenreChange}
+          options={genres}
+          className={s.dropdown}
+          placeholder="Select genre..."
+          styles={customStyles}
+        />
+        <div className={s.resetButtonWrapper}>
+          <button 
+            className={s.resetButton} 
+            onClick={() => handleGenreChange(null)}
+          ></button>
+          <span className={s.resetButtonLabel}>Reset Genre</span>
+        </div>
+      </div>
+      <div className={s.filterGroup}>
+        <CreatableSelect
+          value={selectedYear}
+          onChange={handleYearChange}
+          options={years}
+          className={s.dropdown}
+          placeholder="Select year..."
+          styles={customStyles}
+        />
+        <div className={s.resetButtonWrapper}>
+          <button 
+            className={s.resetButton} 
+            onClick={() => handleYearChange(null)}
+          ></button>
+          <span className={s.resetButtonLabel}>Reset Year</span>
+        </div>
+      </div>
+      <div className={s.resetButtonWrapper}>
+        <button 
+          className={s.resetButton} 
+          onClick={resetAllFilters}
+        ></button>
+        <span className={s.resetButtonLabel}>Reset All</span>
+      </div>
     </div>
   );
 };

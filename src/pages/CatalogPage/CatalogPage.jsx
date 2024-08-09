@@ -6,7 +6,7 @@ import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Filters } from '../../components/ui/Filters';
-import { Button } from '../../components/ui/Button/Button';
+import { Button } from '../../components/ui/Button';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -26,14 +26,12 @@ export const CatalogPage = () => {
 
   useEffect(() => {
     dispatch(resetAlbums());
-    console.log('Dispatching fetchAlbums on mount with params:', { page: 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value });
     dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
   }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
-        console.log('Dispatching fetchAlbums on scroll with params:', { page: currentPage + 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value });
         dispatch(setCurrentPage(currentPage + 1));
         dispatch(fetchAlbums({ page: currentPage + 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
       }
@@ -72,6 +70,13 @@ export const CatalogPage = () => {
     }));
   };
 
+  const resetAllFilters = () => {
+    setSelectedGenre(null);
+    setSelectedYear(null);
+    dispatch(resetAlbums());
+    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null }));
+  };
+
   const handleAlbumClick = (id) => {
     navigate(`/album/${id}`);
   };
@@ -87,13 +92,11 @@ export const CatalogPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      // Удаляем связи альбома с жанрами в таблице genre_album
       await supabase
         .from('genre_album')
         .delete()
         .eq('album_id', selectedAlbumId);
 
-      // Удаляем сам альбом из таблицы albums
       const { data: albumData, error: albumError } = await supabase
         .from('albums')
         .delete()
@@ -105,7 +108,6 @@ export const CatalogPage = () => {
         throw new Error(albumError.message);
       }
 
-      // Если альбом имеет обложку, удаляем её из хранилища
       if (albumData.image) {
         const coverPath = `covers/${albumData.artist}/${albumData.title}`;
         const { error: storageError } = await supabase.storage
@@ -144,6 +146,7 @@ export const CatalogPage = () => {
         handleGenreChange={handleGenreChange}
         selectedYear={selectedYear}
         handleYearChange={handleYearChange}
+        resetAllFilters={resetAllFilters} // Передаем функцию сброса всех фильтров
       />
       {user && user.isEditor && (
         <Button label="New Album" onClick={handleNewAlbumClick} />
