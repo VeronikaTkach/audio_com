@@ -86,13 +86,44 @@ export const CatalogPage = () => {
   };
 
   const handleConfirmDelete = async () => {
-    await supabase
-      .from('albums')
-      .delete()
-      .eq('id', selectedAlbumId);
-    dispatch(deleteAlbum(selectedAlbumId));
-    setShowConfirmDelete(false);
-    setSelectedAlbumId(null);
+    try {
+      // Удаляем связи альбома с жанрами в таблице genre_album
+      await supabase
+        .from('genre_album')
+        .delete()
+        .eq('album_id', selectedAlbumId);
+
+      // Удаляем сам альбом из таблицы albums
+      const { data: albumData, error: albumError } = await supabase
+        .from('albums')
+        .delete()
+        .eq('id', selectedAlbumId)
+        .select()
+        .single();
+
+      if (albumError) {
+        throw new Error(albumError.message);
+      }
+
+      // Если альбом имеет обложку, удаляем её из хранилища
+      if (albumData.image) {
+        const coverPath = `covers/${albumData.artist}/${albumData.title}`;
+        const { error: storageError } = await supabase.storage
+          .from('album_covers')
+          .remove([coverPath]);
+
+        if (storageError) {
+          throw new Error(storageError.message);
+        }
+      }
+
+      dispatch(deleteAlbum(selectedAlbumId));
+      setShowConfirmDelete(false);
+      setSelectedAlbumId(null);
+
+    } catch (error) {
+      console.error('Error deleting album:', error.message);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -143,5 +174,5 @@ export const CatalogPage = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};

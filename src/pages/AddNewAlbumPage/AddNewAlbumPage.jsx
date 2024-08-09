@@ -5,7 +5,7 @@ import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
 import { fetchGenres } from '../../core/store/genresSlice';
-import { fetchAlbums, resetAlbums } from '../../core/store/albumsSlice';
+import { fetchAlbums } from '../../core/store/albumsSlice';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -14,7 +14,7 @@ export const AddNewAlbumPage = () => {
     artist: '',
     description: '',
     format: '',
-    genre: '',
+    genre: [],
     image: '',
     release_date: '',
     value_of_tracks: ''
@@ -62,6 +62,48 @@ export const AddNewAlbumPage = () => {
     return `covers/${artist}/${title}`;
   };
 
+  const saveGenres = async (genres) => {
+    const genreIds = [];
+
+    for (const genre of genres) {
+        const trimmedGenre = genre.trim();
+
+        // Проверяем, существует ли жанр в таблице genre
+        let { data, error } = await supabase
+            .from('genre')
+            .select('genre_id')
+            .eq('genre', trimmedGenre)
+            .single();
+
+        if (error && error.code !== 'PGRST116') { // Если ошибка не связана с отсутствием записи
+            console.error('Error checking genre:', error.message);
+            throw error;
+        }
+
+        if (data) {
+            // Жанр уже существует, добавляем его ID в список
+            genreIds.push(data.genre_id);
+        } else {
+            // Жанра нет, добавляем его
+            const { data: newGenre, error: genreError } = await supabase
+                .from('genre')
+                .insert({ genre: trimmedGenre })
+                .select()
+                .single();
+
+            if (genreError) {
+                console.error('Error adding genre:', genreError.message);
+                throw genreError;
+            }
+
+            // Добавляем ID нового жанра в список
+            genreIds.push(newGenre.genre_id);
+        }
+    }
+
+    return genreIds;
+};
+
   const handleSaveChanges = async () => {
     let albumExists = await checkIfSuchAlbumExists();
 
@@ -89,8 +131,6 @@ export const AddNewAlbumPage = () => {
         return;
       }
 
-      console.log('Upload response:', uploadResponse);
-
       const { data: publicUrlResponse, error: urlError } = supabase
         .storage
         .from('album_covers')
@@ -103,34 +143,45 @@ export const AddNewAlbumPage = () => {
       }
 
       imageUrl = publicUrlResponse.publicUrl;
-
-      console.log('Public URL response:', publicUrlResponse);
-      console.log('Image URL:', imageUrl);
     }
 
-    const newAlbum = {
-      ...album,
-      image: imageUrl || defaultCover
-    };
+    try {
+      // Сначала сохраняем жанры и получаем их IDs
+      const genreIds = await saveGenres(album.genre);
 
-    const { data, error } = await supabase
-      .from('albums')
-      .insert(newAlbum);
+      const newAlbum = {
+        ...album,
+        image: imageUrl || defaultCover
+      };
 
-    if (error) {
-      if (error.code === '23505') {
-        setError('Title, description or image URL already exists.');
-      } else {
-        setError('Error creating album: ' + error.message);
+      // Вставляем альбом в таблицу albums
+      const { data: createdAlbum, error: albumError } = await supabase
+        .from('albums')
+        .insert(newAlbum)
+        .select()
+        .single();
+
+      if (albumError) {
+        console.error('Error creating album:', albumError.message);
+        setError('Error creating album: ' + albumError.message);
+        return;
       }
-      console.error('Error creating album:', error);
-    } else {
-      console.log('New album created successfully:', data);
+
+      // Вставляем связи альбомов с жанрами в таблицу genre_album
+      for (const genreId of genreIds) {
+        await supabase
+          .from('genre_album')
+          .insert({ album_id: createdAlbum.id, genre_id: genreId });
+      }
+
       alert('New Album Created');
-      dispatch(resetAlbums());
       dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
         navigate('/catalog');
       });
+
+    } catch (err) {
+      console.error('Error saving album:', err.message);
+      setError('Error saving album: ' + err.message);
     }
   };
 

@@ -60,58 +60,127 @@ export const EditPage = () => {
     return `covers/${artist}/${title}`;
   };
 
+  const saveGenres = async (genres) => {
+    const genreIds = [];
+
+    for (const genre of genres) {
+        const trimmedGenre = genre.trim();
+
+        // Проверяем, существует ли жанр в таблице genre
+        let { data, error } = await supabase
+            .from('genre')
+            .select('genre_id')
+            .eq('genre', trimmedGenre)
+            .single();
+
+        if (error && error.code !== 'PGRST116') { // Если ошибка не связана с отсутствием записи
+            console.error('Error checking genre:', error.message);
+            throw error;
+        }
+
+        if (data) {
+            // Жанр уже существует, добавляем его ID в список
+            genreIds.push(data.genre_id);
+        } else {
+            // Жанра нет, добавляем его
+            const { data: newGenre, error: genreError } = await supabase
+                .from('genre')
+                .insert({ genre: trimmedGenre })
+                .select()
+                .single();
+
+            if (genreError) {
+                console.error('Error adding genre:', genreError.message);
+                throw genreError;
+            }
+
+            // Добавляем ID нового жанра в список
+            genreIds.push(newGenre.genre_id);
+        }
+    }
+
+    return genreIds;
+  };
+
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
 
-    if (imageFile) {
-      const coverPath = createCoverPath(album.artist, album.title);
+    try {
+      // Сначала сохраняем жанры и получаем их IDs
+      const genreIds = await saveGenres(genre);
 
-      const { data: uploadResponse, error: uploadError } = await supabase
-        .storage
-        .from('album_covers')
-        .upload(coverPath, imageFile, {
-          upsert: true
-        });
+      if (imageFile) {
+        const coverPath = createCoverPath(album.artist, album.title);
 
-      if (uploadError) {
-        console.error('Error uploading image:', uploadError);
-        setError('Error uploading image: ' + uploadError.message);
+        const { data: uploadResponse, error: uploadError } = await supabase
+          .storage
+          .from('album_covers')
+          .upload(coverPath, imageFile, {
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          setError('Error uploading image: ' + uploadError.message);
+          return;
+        }
+
+        const { data: publicUrlResponse } = supabase
+          .storage
+          .from('album_covers')
+          .getPublicUrl(coverPath);
+
+        if (publicUrlResponse.error) {
+          console.error('Error getting public URL:', publicUrlResponse.error);
+          setError('Error getting public URL: ' + publicUrlResponse.error.message);
+          return;
+        }
+
+        album.image = publicUrlResponse.publicUrl;
+      }
+
+      // Обновляем альбом в таблице albums
+      const { data: updatedAlbum, error: updateError } = await supabase
+        .from('albums')
+        .update({
+          title,
+          artist,
+          description,
+          format,
+          genre,
+          image,
+          release_date,
+          value_of_tracks
+        })
+        .eq('id', albumId)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Error updating album:', updateError.message);
+        setError('Error updating album: ' + updateError.message);
         return;
       }
 
-      const { data: publicUrlResponse } = supabase
-        .storage
-        .from('album_covers')
-        .getPublicUrl(coverPath);
+      // Удаляем старые связи альбома с жанрами в таблице genre_album
+      await supabase
+        .from('genre_album')
+        .delete()
+        .eq('album_id', albumId);
 
-      if (publicUrlResponse.error) {
-        console.error('Error getting public URL:', publicUrlResponse.error);
-        setError('Error getting public URL: ' + publicUrlResponse.error.message);
-        return;
+      // Добавляем новые связи альбома с жанрами
+      for (const genreId of genreIds) {
+        await supabase
+          .from('genre_album')
+          .insert({ album_id: albumId, genre_id: genreId });
       }
 
-      album.image = publicUrlResponse.publicUrl;
-    }
-
-    const { data, error } = await supabase
-      .from('albums')
-      .update({
-        title,
-        artist,
-        description,
-        format,
-        genre,
-        image,
-        release_date,
-        value_of_tracks
-      })
-      .eq('id', albumId);
-
-    if (error) {
-      console.error("Error updating album:", error);
-    } else {
-      alert("Album updated successfully!");
+      alert('Album updated successfully!');
       navigate(`/album/${albumId}`);
+
+    } catch (err) {
+      console.error('Error updating album:', err.message);
+      setError('Error updating album: ' + err.message);
     }
   };
 
