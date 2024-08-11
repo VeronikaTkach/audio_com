@@ -30,8 +30,10 @@ export const Header = () => {
 
   return (
     <div className={s.header}>
-      <LinkLikeButton label="Catalog" to="/catalog" />
-      <ThemeToggle />
+      <div className={s.header__actions}>
+        <LinkLikeButton label="Catalog" to="/catalog" />
+        <ThemeToggle />   
+      </div>
       {user ? (
         <div className={s.header__info}>
           {!user.isEditor && (

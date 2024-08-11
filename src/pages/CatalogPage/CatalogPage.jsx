@@ -7,6 +7,7 @@ import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Filters } from '../../components/ui/Filters';
 import { Button } from '../../components/ui/Button';
+import { AlbumItem } from '../../components/AlbumItem/AlbumItem';
 import s from './styles.module.scss';
 
 export const CatalogPage = () => {
@@ -16,7 +17,7 @@ export const CatalogPage = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
-  const [selectedFormats, setSelectedFormats] = useState([]); // Множественный выбор форматов
+  const [selectedFormats, setSelectedFormats] = useState([]);
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -88,7 +89,7 @@ export const CatalogPage = () => {
   };
 
   const handleFormatChange = (selectedOptions) => {
-    setSelectedFormats(selectedOptions || []); // Обновление состояния форматов
+    setSelectedFormats(selectedOptions || []);
     dispatch(resetAlbums());
     dispatch(fetchAlbums({ 
       page: 1, 
@@ -103,7 +104,7 @@ export const CatalogPage = () => {
   const resetAllFilters = () => {
     setSelectedGenre(null);
     setSelectedYear(null);
-    setSelectedFormats([]); // Сбрасываем все форматы
+    setSelectedFormats([]);
     dispatch(resetAlbums());
     dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null, formats: [] }));
   };
@@ -123,19 +124,16 @@ export const CatalogPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-        // Удаляем все записи из таблицы format_album, связанные с удаляемым альбомом
         await supabase
             .from('format_album')
             .delete()
             .eq('album_id', selectedAlbumId);
 
-        // Удаляем все записи из таблицы genre_album, связанные с удаляемым альбомом
         await supabase
             .from('genre_album')
             .delete()
             .eq('album_id', selectedAlbumId);
 
-        // Теперь удаляем сам альбом из таблицы albums
         const { data: albumData, error: albumError } = await supabase
             .from('albums')
             .delete()
@@ -147,7 +145,6 @@ export const CatalogPage = () => {
             throw new Error(albumError.message);
         }
 
-        // Удаляем обложку альбома из хранилища, если она существует
         if (albumData.image) {
             const coverPath = `covers/${albumData.artist}/${albumData.title}`;
             const { error: storageError } = await supabase.storage
@@ -159,7 +156,6 @@ export const CatalogPage = () => {
             }
         }
 
-        // Обновляем состояние, удаляя альбом из списка
         dispatch(deleteAlbum(selectedAlbumId));
         setShowConfirmDelete(false);
         setSelectedAlbumId(null);
@@ -196,21 +192,14 @@ export const CatalogPage = () => {
       )}
       <div className={s.catalog__albums__list}>
         {albums.map(album => (
-          <div key={album.id} className={s.album__item} onClick={() => handleAlbumClick(album.id)}>
-            <div className={s.album__info}>
-              <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
-              <div className={s.album__details}>
-                <div className={s.album__artist}>{album.artist}</div>
-                <div className={s.album__title}>{album.title}</div>
-              </div>
-            </div>
-            {user && user.isEditor && (
-              <div className={s.album__actions}>
-                <Button label="Edit" onClick={(e) => { e.stopPropagation(); handleEditClick(album.id); }} className={s.album__button} />
-                <Button label="Delete" onClick={(e) => { e.stopPropagation(); handleDeleteClick(album.id); }} className={s.album__button} />
-              </div>
-            )}
-          </div>
+          <AlbumItem 
+            key={album.id} 
+            album={album} 
+            onClick={handleAlbumClick} 
+            onEdit={handleEditClick} 
+            onDelete={handleDeleteClick} 
+            isEditor={user && user.isEditor}
+          />
         ))}
       </div>
       {showConfirmDelete && (

@@ -2,12 +2,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 20px 40px;
   background-color: var(--background-color-header);
   color: var(--text-color);
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
   &__info {
     display: flex;
     align-items: center;
+    gap: 20px;
   }
 }
 

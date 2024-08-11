@@ -1,0 +1,42 @@
+.album {
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #ccc;
+    padding: 15px;
+    gap: 20px;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 0 10px 5px var(--text-color);
+    }
+  }
+  &__image {
+    width: 150px;
+    height: 150px;
+  }
+  &__info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+  &__artist {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--text-color);
+  }
+  &__title {
+    font-size: 1em;
+    color: gray;
+  }
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+  }
+}

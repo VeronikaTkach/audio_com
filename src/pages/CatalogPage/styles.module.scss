@@ -9,58 +9,17 @@
 .catalog {
   &__albums__list {
     margin-top: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    row-gap: 30px;
-    column-gap: 150px;
-    justify-content: center;
-  }
-}
-
-.album {
-  &__item {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    cursor: pointer;
-    flex: 1 1 calc(50% - 30px);
-    max-width: calc(50% - 200px);
-    border: 1px solid transparent;
-    transition: box-shadow 0.3s ease-in-out;
-    // background: var(--text-color);
-
-    &:hover {
-      box-shadow: 0 0 10px 5px var(--text-color);
+    display: grid; /* Используем grid для создания сетки */
+    grid-template-columns: repeat(2, 1fr); /* Две колонки */
+    grid-template-rows: repeat(2, auto); /* Две строки */
+    row-gap: 20px;
+    width: 100%;
+    column-gap: 50px;
+    @media (max-width: 950px) {
+      grid-template-columns: 1fr; /* Одна колонка */
+      grid-template-rows: auto; /* Автоматическая высота строк */
+      column-gap: 0; /* Убираем расстояние между колонками */
+      max-width: 600px;
     }
-    
-    @media (max-width: 768px) {
-      flex: 1 1 100%;
-      max-width: 100%;
-    }
-  }
-  &__image {
-    width: 150px;
-    height: 150px;
-  }
-  &__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 10px;
-  }
-  &__artist {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--text-color);
-  }
-  &__title {
-    font-size: 1em;
-    color: gray;
-  }
-  &__actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 15px;
   }
 }
