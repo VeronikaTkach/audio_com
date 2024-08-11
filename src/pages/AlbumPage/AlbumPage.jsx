@@ -5,6 +5,7 @@ import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Button } from '../../components/ui/Button/Button';
+import { deleteAlbum } from '../../core/store/albumsSlice'; // Добавим этот импорт
 import s from './styles.module.scss';
 
 export const AlbumPage = () => {
@@ -14,6 +15,7 @@ export const AlbumPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export const AlbumPage = () => {
   useEffect(() => {
     const checkIfFavorite = async () => {
       if (user && albumId) {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('favorites')
           .select('*')
           .eq('user_id', user.id)
@@ -66,20 +68,65 @@ export const AlbumPage = () => {
     checkIfFavorite();
   }, [user, albumId]);
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = async (id) => {
+    setSelectedAlbumId(id);
     setShowConfirmDelete(true);
   };
 
   const handleConfirmDelete = async () => {
-    await supabase
-      .from('albums')
-      .delete()
-      .eq('id', albumId);
-    navigate('/catalog');
+    try {
+        // Удаляем все записи из таблицы format_album, связанные с удаляемым альбомом
+        await supabase
+            .from('format_album')
+            .delete()
+            .eq('album_id', selectedAlbumId);
+
+        // Удаляем все записи из таблицы genre_album, связанные с удаляемым альбомом
+        await supabase
+            .from('genre_album')
+            .delete()
+            .eq('album_id', selectedAlbumId);
+
+        // Теперь удаляем сам альбом из таблицы albums
+        const { data: albumData, error: albumError } = await supabase
+            .from('albums')
+            .delete()
+            .eq('id', selectedAlbumId)
+            .select()
+            .single();
+
+        if (albumError) {
+            throw new Error(albumError.message);
+        }
+
+        // Удаляем обложку альбома из хранилища, если она существует
+        if (albumData.image) {
+            const coverPath = `covers/${albumData.artist}/${albumData.title}`;
+            const { error: storageError } = await supabase.storage
+                .from('album_covers')
+                .remove([coverPath]);
+
+            if (storageError) {
+                throw new Error(storageError.message);
+            }
+        }
+
+        // Обновляем состояние, удаляя альбом из списка
+        dispatch(deleteAlbum(selectedAlbumId));
+        setShowConfirmDelete(false);
+        setSelectedAlbumId(null);
+
+        // Перенаправление на каталог после успешного удаления
+        navigate('/catalog');
+
+    } catch (error) {
+        console.error('Error deleting album:', error.message);
+    }
   };
 
   const handleCancelDelete = () => {
     setShowConfirmDelete(false);
+    setSelectedAlbumId(null);
   };
 
   const handleEditClick = () => {
@@ -99,7 +146,7 @@ export const AlbumPage = () => {
         return;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('favorites')
         .insert([{ 
           user_id: user.id, 
@@ -137,7 +184,7 @@ export const AlbumPage = () => {
           {user && user.isEditor && (
             <div className={s.album__actions}>
               <Button label="Edit" onClick={handleEditClick}/>
-              <Button label="Delete" onClick={handleDeleteClick}/>
+              <Button label="Delete" onClick={() => handleDeleteClick(albumId)}/> {/* Используем albumId */}
             </div>
           )}
           {user && !user.isEditor && !isFavorite && (

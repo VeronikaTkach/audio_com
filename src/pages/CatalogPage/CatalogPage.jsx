@@ -123,39 +123,49 @@ export const CatalogPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await supabase
-        .from('genre_album')
-        .delete()
-        .eq('album_id', selectedAlbumId);
+        // Удаляем все записи из таблицы format_album, связанные с удаляемым альбомом
+        await supabase
+            .from('format_album')
+            .delete()
+            .eq('album_id', selectedAlbumId);
 
-      const { data: albumData, error: albumError } = await supabase
-        .from('albums')
-        .delete()
-        .eq('id', selectedAlbumId)
-        .select()
-        .single();
+        // Удаляем все записи из таблицы genre_album, связанные с удаляемым альбомом
+        await supabase
+            .from('genre_album')
+            .delete()
+            .eq('album_id', selectedAlbumId);
 
-      if (albumError) {
-        throw new Error(albumError.message);
-      }
+        // Теперь удаляем сам альбом из таблицы albums
+        const { data: albumData, error: albumError } = await supabase
+            .from('albums')
+            .delete()
+            .eq('id', selectedAlbumId)
+            .select()
+            .single();
 
-      if (albumData.image) {
-        const coverPath = `covers/${albumData.artist}/${albumData.title}`;
-        const { error: storageError } = await supabase.storage
-          .from('album_covers')
-          .remove([coverPath]);
-
-        if (storageError) {
-          throw new Error(storageError.message);
+        if (albumError) {
+            throw new Error(albumError.message);
         }
-      }
 
-      dispatch(deleteAlbum(selectedAlbumId));
-      setShowConfirmDelete(false);
-      setSelectedAlbumId(null);
+        // Удаляем обложку альбома из хранилища, если она существует
+        if (albumData.image) {
+            const coverPath = `covers/${albumData.artist}/${albumData.title}`;
+            const { error: storageError } = await supabase.storage
+                .from('album_covers')
+                .remove([coverPath]);
+
+            if (storageError) {
+                throw new Error(storageError.message);
+            }
+        }
+
+        // Обновляем состояние, удаляя альбом из списка
+        dispatch(deleteAlbum(selectedAlbumId));
+        setShowConfirmDelete(false);
+        setSelectedAlbumId(null);
 
     } catch (error) {
-      console.error('Error deleting album:', error.message);
+        console.error('Error deleting album:', error.message);
     }
   };
 
