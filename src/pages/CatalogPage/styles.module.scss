@@ -2,23 +2,33 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  // align-items: center;
   gap: 20px;
+  &__header {
+    display: flex;
+    gap: 25vw;
+    justify-content: flex-start;
+  }
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 .catalog {
   &__albums__list {
     margin-top: 40px;
-    display: grid; /* Используем grid для создания сетки */
-    grid-template-columns: repeat(2, 1fr); /* Две колонки */
-    grid-template-rows: repeat(2, auto); /* Две строки */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
     row-gap: 20px;
     width: 100%;
     column-gap: 50px;
     @media (max-width: 950px) {
-      grid-template-columns: 1fr; /* Одна колонка */
-      grid-template-rows: auto; /* Автоматическая высота строк */
-      column-gap: 0; /* Убираем расстояние между колонками */
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      column-gap: 0;
       max-width: 600px;
     }
   }

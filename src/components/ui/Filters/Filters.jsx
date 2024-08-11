@@ -94,7 +94,7 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
 
   return (
     <div className={s.filters}>
-      <div className={s.filterGroup}>
+      <div className={s.filters__group}>
         <CreatableSelect
           isMulti
           value={selectedGenre}
@@ -104,15 +104,15 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
           placeholder="Select genre..."
           styles={customStyles}
         />
-        <div className={s.resetButtonWrapper}>
+        <div className={s.reset__buttonWrapper}>
           <button 
-            className={s.resetButton} 
+            className={s.reset__button} 
             onClick={() => handleGenreChange(null)}
           ></button>
-          <span className={s.resetButtonLabel}>Reset Genre</span>
+          <span className={s.reset__buttonLabel}>Reset Genre</span>
         </div>
       </div>
-      <div className={s.filterGroup}>
+      <div className={s.filters__group}>
         <CreatableSelect
           value={selectedYear}
           onChange={handleYearChange}
@@ -121,15 +121,15 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
           placeholder="Select year..."
           styles={customStyles}
         />
-        <div className={s.resetButtonWrapper}>
+        <div className={s.reset__buttonWrapper}>
           <button 
-            className={s.resetButton} 
+            className={s.reset__button} 
             onClick={() => handleYearChange(null)}
           ></button>
-          <span className={s.resetButtonLabel}>Reset Year</span>
+          <span className={s.reset__buttonLabel}>Reset Year</span>
         </div>
       </div>
-      <div className={s.filterGroup}>
+      <div className={s.filters__group}>
         <CreatableSelect
           isMulti
           value={selectedFormats}
@@ -139,20 +139,21 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
           placeholder="Select formats..."
           styles={customStyles}
         />
-        <div className={s.resetButtonWrapper}>
+        <div className={s.reset__buttonWrapper}>
           <button 
-            className={s.resetButton} 
+            className={s.reset__button} 
             onClick={() => handleFormatChange([])}
           ></button>
-          <span className={s.resetButtonLabel}>Reset Formats</span>
+          <span className={s.reset__buttonLabel}>Reset Formats</span>
         </div>
       </div>
-      <div className={s.resetButtonWrapper}>
+      <div className={s.reset__buttonWrapper}>
+        <span style={{width: '205px'}}/>
         <button 
-          className={s.resetButton} 
+          className={s.reset__button} 
           onClick={resetAllFilters}
         ></button>
-        <span className={s.resetButtonLabel}>Reset All</span>
+        <span className={s.reset__buttonLabel}>Reset All</span>
       </div>
     </div>
   );

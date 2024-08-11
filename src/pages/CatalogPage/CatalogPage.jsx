@@ -177,30 +177,34 @@ export const CatalogPage = () => {
   return (
     <div className={s.container}>
       <h1>Albums</h1>
-      <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
-      <Filters
-        selectedGenre={selectedGenre}
-        handleGenreChange={handleGenreChange}
-        selectedYear={selectedYear}
-        handleYearChange={handleYearChange}
-        selectedFormats={selectedFormats}
-        handleFormatChange={handleFormatChange}
-        resetAllFilters={resetAllFilters}
-      />
-      {user && user.isEditor && (
-        <Button label="New Album" onClick={handleNewAlbumClick} />
-      )}
+      <div className={s.container__header}>
+        <Filters
+          selectedGenre={selectedGenre}
+          handleGenreChange={handleGenreChange}
+          selectedYear={selectedYear}
+          handleYearChange={handleYearChange}
+          selectedFormats={selectedFormats}
+          handleFormatChange={handleFormatChange}
+          resetAllFilters={resetAllFilters}
+        />
+        <div className={s.container__actions}>
+          <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
+          {user && user.isEditor && (
+            <Button label="CreateNew Album" onClick={handleNewAlbumClick} />
+          )}
+        </div>
+      </div>
       <div className={s.catalog__albums__list}>
-        {albums.map(album => (
-          <AlbumItem 
-            key={album.id} 
-            album={album} 
-            onClick={handleAlbumClick} 
-            onEdit={handleEditClick} 
-            onDelete={handleDeleteClick} 
-            isEditor={user && user.isEditor}
-          />
-        ))}
+          {albums.map(album => (
+            <AlbumItem 
+              key={album.id} 
+              album={album} 
+              onClick={handleAlbumClick} 
+              onEdit={handleEditClick} 
+              onDelete={handleDeleteClick} 
+              isEditor={user && user.isEditor}
+            />
+          ))}
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal
