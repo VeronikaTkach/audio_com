@@ -16,6 +16,7 @@ export const CatalogPage = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedFormats, setSelectedFormats] = useState([]); // Множественный выбор форматов
 
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
@@ -26,21 +27,35 @@ export const CatalogPage = () => {
 
   useEffect(() => {
     dispatch(resetAlbums());
-    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
-  }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear]);
+    dispatch(fetchAlbums({ 
+      page: 1, 
+      perPage: albumsPerPage, 
+      searchTerm, 
+      genre: selectedGenre?.value, 
+      year: selectedYear?.value, 
+      formats: selectedFormats.map(f => f.value) 
+    }));
+  }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear, selectedFormats]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
         dispatch(setCurrentPage(currentPage + 1));
-        dispatch(fetchAlbums({ page: currentPage + 1, perPage: albumsPerPage, searchTerm, genre: selectedGenre?.value, year: selectedYear?.value }));
+        dispatch(fetchAlbums({ 
+          page: currentPage + 1, 
+          perPage: albumsPerPage, 
+          searchTerm, 
+          genre: selectedGenre?.value, 
+          year: selectedYear?.value, 
+          formats: selectedFormats.map(f => f.value)
+        }));
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear]);
+  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats]);
 
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));
@@ -54,7 +69,8 @@ export const CatalogPage = () => {
       perPage: albumsPerPage, 
       searchTerm, 
       genre: selectedOption?.value, 
-      year: selectedYear?.value 
+      year: selectedYear?.value,
+      formats: selectedFormats.map(f => f.value),
     }));
   };
   
@@ -66,15 +82,30 @@ export const CatalogPage = () => {
       perPage: albumsPerPage, 
       searchTerm, 
       genre: selectedGenre?.value, 
-      year: selectedOption?.value 
+      year: selectedOption?.value,
+      formats: selectedFormats.map(f => f.value), 
+    }));
+  };
+
+  const handleFormatChange = (selectedOptions) => {
+    setSelectedFormats(selectedOptions || []); // Обновление состояния форматов
+    dispatch(resetAlbums());
+    dispatch(fetchAlbums({ 
+      page: 1, 
+      perPage: albumsPerPage, 
+      searchTerm, 
+      genre: selectedGenre?.value, 
+      year: selectedYear?.value,
+      formats: (selectedOptions || []).map(f => f.value),
     }));
   };
 
   const resetAllFilters = () => {
     setSelectedGenre(null);
     setSelectedYear(null);
+    setSelectedFormats([]); // Сбрасываем все форматы
     dispatch(resetAlbums());
-    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null }));
+    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null, formats: [] }));
   };
 
   const handleAlbumClick = (id) => {
@@ -146,7 +177,9 @@ export const CatalogPage = () => {
         handleGenreChange={handleGenreChange}
         selectedYear={selectedYear}
         handleYearChange={handleYearChange}
-        resetAllFilters={resetAllFilters} // Передаем функцию сброса всех фильтров
+        selectedFormats={selectedFormats}
+        handleFormatChange={handleFormatChange}
+        resetAllFilters={resetAllFilters}
       />
       {user && user.isEditor && (
         <Button label="New Album" onClick={handleNewAlbumClick} />

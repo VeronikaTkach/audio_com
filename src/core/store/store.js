@@ -4,6 +4,7 @@ import albumsReducer from '../store/albumsSlice';
 import userSlice from '../store/userSlice';
 import genresReducer from './genresSlice';
 import yearsReducer from './yearsSlice';
+import formatsReducer from './formatsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     user: userSlice,
     genres: genresReducer,
     years: yearsReducer,
+    formats: formatsReducer,
   },
 });
 

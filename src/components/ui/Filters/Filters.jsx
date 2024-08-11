@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGenres } from '../../../core/store/genresSlice';
 import { fetchYears } from '../../../core/store/yearsSlice';
+import { fetchFormats } from '../../../core/store/formatsSlice';
 import CreatableSelect from 'react-select/creatable';
 import s from './styles.module.scss';
 
@@ -65,10 +66,11 @@ const customStyles = {
   }),
 };
 
-export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handleYearChange, resetAllFilters }) => {
+export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handleYearChange, selectedFormats, handleFormatChange, resetAllFilters }) => {
   const dispatch = useDispatch();
   const { genres, status: genreStatus } = useSelector(state => state.genres);
   const { years, status: yearStatus } = useSelector(state => state.years);
+  const { formats, status: formatStatus } = useSelector(state => state.formats);
 
   useEffect(() => {
     if (genreStatus === 'idle') {
@@ -77,13 +79,16 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
     if (yearStatus === 'idle') {
       dispatch(fetchYears());
     }
-  }, [genreStatus, yearStatus, dispatch]);
+    if (formatStatus === 'idle') {
+      dispatch(fetchFormats());
+    }
+  }, [genreStatus, yearStatus, formatStatus, dispatch]);
 
-  if (genreStatus === 'loading' || yearStatus === 'loading') {
+  if (genreStatus === 'loading' || yearStatus === 'loading' || formatStatus === 'loading') {
     return <div>Loading filters...</div>;
   }
 
-  if (genreStatus === 'failed' || yearStatus === 'failed') {
+  if (genreStatus === 'failed' || yearStatus === 'failed' || formatStatus === 'failed') {
     return <div>Error loading filters.</div>;
   }
 
@@ -121,6 +126,24 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
             onClick={() => handleYearChange(null)}
           ></button>
           <span className={s.resetButtonLabel}>Reset Year</span>
+        </div>
+      </div>
+      <div className={s.filterGroup}>
+        <CreatableSelect
+          isMulti
+          value={selectedFormats}
+          onChange={handleFormatChange}
+          options={formats}
+          className={s.dropdown}
+          placeholder="Select formats..."
+          styles={customStyles}
+        />
+        <div className={s.resetButtonWrapper}>
+          <button 
+            className={s.resetButton} 
+            onClick={() => handleFormatChange([])}
+          ></button>
+          <span className={s.resetButtonLabel}>Reset Formats</span>
         </div>
       </div>
       <div className={s.resetButtonWrapper}>

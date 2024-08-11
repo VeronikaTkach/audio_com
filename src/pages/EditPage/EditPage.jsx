@@ -34,8 +34,14 @@ export const EditPage = () => {
       if (error) {
         console.error('Error fetching album:', error);
       } else {
+        if (typeof data.genre === 'string') {
+          data.genre = JSON.parse(data.genre);
+        }
+        if (typeof data.format === 'string') {
+          data.format = JSON.parse(data.format);
+        }
         setAlbum(data);
-        setOriginalAlbum(data);
+        console.log("Fetched album:", data);
       }
     };
 
@@ -46,8 +52,15 @@ export const EditPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setAlbum({ ...album, [name]: value });
-  };
+    if (name === 'format') {
+      const formats = album.format.includes(value)
+        ? album.format.filter(f => f !== value)
+        : [...album.format, value];
+      setAlbum({ ...album, format: formats });
+    } else {
+      setAlbum({ ...album, [name]: value });
+    }
+  };  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -102,12 +115,51 @@ export const EditPage = () => {
     return genreIds;
   };
 
+  const saveFormats = async (formats) => {
+    const formatIds = [];
+  
+    for (const format of formats) {
+      const trimmedFormat = format.trim();
+  
+      let { data, error } = await supabase
+        .from('format')
+        .select('format_id')
+        .eq('format', trimmedFormat)
+        .single();
+  
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking format:', error.message);
+        throw error;
+      }
+  
+      if (data) {
+        formatIds.push(data.format_id);
+      } else {
+        const { data: newFormat, error: formatError } = await supabase
+          .from('format')
+          .insert({ format: trimmedFormat })
+          .select()
+          .single();
+  
+        if (formatError) {
+          console.error('Error adding format:', formatError.message);
+          throw formatError;
+        }
+  
+        formatIds.push(newFormat.format_id);
+      }
+    }
+  
+    return formatIds;
+  };
+
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
 
     try {
       // Сначала сохраняем жанры и получаем их IDs
       const genreIds = await saveGenres(genre);
+      const formatIds = await saveFormats(format);
 
       if (imageFile) {
         const coverPath = createCoverPath(album.artist, album.title);
@@ -173,6 +225,12 @@ export const EditPage = () => {
         await supabase
           .from('genre_album')
           .insert({ album_id: albumId, genre_id: genreId });
+      }
+
+      for (const formatId of formatIds) {
+        await supabase
+          .from('format_album')
+          .insert({ album_id: albumId, format_id: formatId });
       }
 
       alert('Album updated successfully!');
