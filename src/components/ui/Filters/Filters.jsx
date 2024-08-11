@@ -96,6 +96,7 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
     <div className={s.filters}>
       <div className={s.filterGroup}>
         <CreatableSelect
+          isMulti
           value={selectedGenre}
           onChange={handleGenreChange}
           options={genres}
