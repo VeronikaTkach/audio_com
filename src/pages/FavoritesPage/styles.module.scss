@@ -1,18 +1,26 @@
-.favorites__page {
-  padding: 20px;
-  &__table {
-    width: 100%;
-    border-collapse: collapse;
+.favorites {
+  &__page {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    &__table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    &__ th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    
+    &__ th {
+      background-color: #f2f2f2;
+      text-align: left;
+    }
   }
-  
-  &__ th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  &__ th {
-    background-color: #f2f2f2;
-    text-align: left;
+  &__image {
+    max-width: 300px;
+    max-height: 300px;
   }
 }
-

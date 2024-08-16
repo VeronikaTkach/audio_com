@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import s from './styles.module.scss';
+import { Button } from '../../components/ui/Button';
 
 export const FavoritesPage = () => {
   const [favorites, setFavorites] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const user = useSelector((state) => state.user.user);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -71,6 +74,10 @@ export const FavoritesPage = () => {
     }
   };
 
+  const handleAlbumPageClick = (albumId) => {
+    navigate(`/album/${albumId}`);
+  };
+
   return (
     <div className={s.favorites__page}>
       <h2>Your Favorites</h2>
@@ -81,6 +88,7 @@ export const FavoritesPage = () => {
               <th>Cover</th>
               <th>Title</th>
               <th>Artist</th>
+              <th>Album Page</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -90,12 +98,13 @@ export const FavoritesPage = () => {
                 <td>
                   <img src={fav.image} alt={`${fav.title} cover`} className={s.favorites__image} />
                 </td>
-                <td>{fav.title}</td>
-                <td>{fav.artist}</td>
+                <td style={{fontWeight:'bold'}}>{fav.title}</td>
+                <td style={{fontWeight:'bold'}}>{fav.artist}</td>
                 <td>
-                  <button onClick={() => handleDeleteClick(fav.id)} className={s.delete__button}>
-                    &#10005;
-                  </button>
+                  <Button label={'Album Page'} onClick={() => handleAlbumPageClick(fav.album_id)} className={s.album__button}/>
+                </td>
+                <td>
+                  <Button label={'x'} onClick={() => handleDeleteClick(fav.id)} className={s.delete__button}/>
                 </td>
               </tr>
             ))}
@@ -104,10 +113,8 @@ export const FavoritesPage = () => {
       ) : (
         <p>No favorites found.</p>
       )}
-      <div className={s.delete_all}>
-        <button onClick={handleDeleteAllClick} className={s.delete_all__button}>
-          Delete All
-        </button>
+      <div className={s.deleteAll}>
+        <Button label={'Delete All'} onClick={handleDeleteAllClick} className={s.delete_all__button}/>
       </div>
       {showDeleteModal && (
         <ConfirmDeleteModal
