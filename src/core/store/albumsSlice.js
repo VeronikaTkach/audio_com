@@ -112,16 +112,21 @@ const albumsSlice = createSlice({
   },
   reducers: {
     setSearchTerm(state, action) {
+      console.log('Setting search term in slice:', action.payload);
       state.searchTerm = action.payload;
       state.currentPage = 1;
     },
     setCurrentPage(state, action) {
+      console.log('Setting current page:', action.payload);
       state.currentPage = action.payload;
     },
     deleteAlbum(state, action) {
+      console.log('Deleting album with ID:', action.payload);
       state.items = state.items.filter(album => album.id !== action.payload);
+      console.log('Updated album list:', state.items);
     },
     resetAlbums(state) {
+      console.log('Resetting albums...');
       state.items = [];
       state.status = 'idle';
     }
@@ -129,17 +134,21 @@ const albumsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAlbums.pending, (state) => {
+        console.log('Fetching albums - pending');
         state.status = 'loading';
       })
       .addCase(fetchAlbums.fulfilled, (state, action) => {
+        console.log('Fetching albums - fulfilled:', action.payload);
         state.status = 'succeeded';
         if (state.currentPage === 1) {
           state.items = action.payload;
         } else {
           state.items = [...state.items, ...action.payload];
         }
+        console.log('Updated items after fetch:', state.items);
       })
       .addCase(fetchAlbums.rejected, (state, action) => {
+        console.error('Fetching albums - failed:', action.error.message);
         state.status = 'failed';
         state.error = action.error.message;
       });

@@ -3,51 +3,49 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
-import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
-import { Button } from '../../components/ui/Button/Button';
-import { deleteAlbum } from '../../core/store/albumsSlice'; // Добавим этот импорт
+import { Button } from '../../components/ui/Button';
+import { EditAlbumButton, DeleteAlbumButton } from '../../components/ui/Button';
 import s from './styles.module.scss';
 
 export const AlbumPage = () => {
   const { albumId } = useParams();
   const [album, setAlbum] = useState(null);
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false); // Состояние для отслеживания удаления
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
 
-  useEffect(() => {
-    const fetchAlbum = async () => {
-      const { data, error } = await supabase
-        .from('albums')
-        .select('*')
-        .eq('id', albumId)
-        .single();
+  const fetchAlbum = async () => {
+    const { data, error } = await supabase
+      .from('albums')
+      .select('*')
+      .eq('id', albumId)
+      .single();
 
-      if (error) {
-        console.error('Error fetching album:', error);
-      } else {
-        if (typeof data.genre === 'string') {
-          data.genre = JSON.parse(data.genre);
-        }
-        if (typeof data.format === 'string') {
-          data.format = JSON.parse(data.format);
-        }
-        setAlbum(data);
-        console.log("Fetched album:", data);
+    if (error || !data) {
+      console.error('Error fetching album or album not found:', error);
+      setIsDeleted(true); // Устанавливаем состояние, если альбом не найден или произошла ошибка
+    } else {
+      if (typeof data.genre === 'string') {
+        data.genre = JSON.parse(data.genre);
       }
-    };
+      if (typeof data.format === 'string') {
+        data.format = JSON.parse(data.format);
+      }
+      setAlbum(data);
+    }
+  };
 
-    if (albumId) {
+  useEffect(() => {
+    if (albumId && !isDeleted) {
       fetchAlbum();
     }
-  }, [albumId]);
+  }, [albumId, isDeleted]);
 
   useEffect(() => {
     const checkIfFavorite = async () => {
@@ -68,65 +66,12 @@ export const AlbumPage = () => {
     checkIfFavorite();
   }, [user, albumId]);
 
-  const handleDeleteClick = async (id) => {
-    setSelectedAlbumId(id);
-    setShowConfirmDelete(true);
-  };
+  const handleDeleteAlbum = async (id) => {
+    console.log(`Album ${id} deleted`);
+    setIsDeleted(true); // Устанавливаем состояние как удаленное
 
-  const handleConfirmDelete = async () => {
-    try {
-        // Удаляем все записи из таблицы format_album, связанные с удаляемым альбомом
-        await supabase
-            .from('format_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
-
-        // Удаляем все записи из таблицы genre_album, связанные с удаляемым альбомом
-        await supabase
-            .from('genre_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
-
-        // Теперь удаляем сам альбом из таблицы albums
-        const { data: albumData, error: albumError } = await supabase
-            .from('albums')
-            .delete()
-            .eq('id', selectedAlbumId)
-            .select()
-            .single();
-
-        if (albumError) {
-            throw new Error(albumError.message);
-        }
-
-        // Удаляем обложку альбома из хранилища, если она существует
-        if (albumData.image) {
-            const coverPath = `covers/${albumData.artist}/${albumData.title}`;
-            const { error: storageError } = await supabase.storage
-                .from('album_covers')
-                .remove([coverPath]);
-
-            if (storageError) {
-                throw new Error(storageError.message);
-            }
-        }
-
-        // Обновляем состояние, удаляя альбом из списка
-        dispatch(deleteAlbum(selectedAlbumId));
-        setShowConfirmDelete(false);
-        setSelectedAlbumId(null);
-
-        // Перенаправление на каталог после успешного удаления
-        navigate('/catalog');
-
-    } catch (error) {
-        console.error('Error deleting album:', error.message);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setShowConfirmDelete(false);
-    setSelectedAlbumId(null);
+    // Повторная загрузка данных после удаления для обновления UI
+    await fetchAlbum();
   };
 
   const handleEditClick = () => {
@@ -165,9 +110,29 @@ export const AlbumPage = () => {
     }
   };
 
-  if (!album) return <div>Loading...</div>;
+  const handleNavigateToCatalog = () => {
+    navigate('/catalog');
+  };
 
-  console.log("Album image URL:", album.image);
+  const handleNavigateToNewAlbum = () => {
+    navigate('/album/new');
+  };
+
+  // Если альбом был удален, показываем сообщение и кнопки навигации
+  if (isDeleted) {
+    return (
+      <div className={s.album__deleted}>
+        <h2>Album deleted!</h2>
+        <div className={s.album__actions}>
+          <Button label="Create New Album" onClick={handleNavigateToNewAlbum} />
+          <Button label="Catalog" onClick={handleNavigateToCatalog} />
+        </div>
+      </div>
+    );
+  }
+
+  // Если альбом еще загружается
+  if (!album) return <div>Loading...</div>;
 
   return (
     <div className={s.album__page}>
@@ -183,8 +148,16 @@ export const AlbumPage = () => {
           <p><strong>Format:</strong> {album.format.join(', ')}</p>
           {user && user.isEditor && (
             <div className={s.album__actions}>
-              <Button label="Edit" onClick={handleEditClick}/>
-              <Button label="Delete" onClick={() => handleDeleteClick(albumId)}/> {/* Используем albumId */}
+              <EditAlbumButton 
+                albumId={albumId} 
+                onEdit={handleEditClick} 
+                className={s.album__button} 
+              />
+              <DeleteAlbumButton 
+                albumId={albumId} 
+                onDelete={handleDeleteAlbum} 
+                className={s.album__button} 
+              />
             </div>
           )}
           {user && !user.isEditor && !isFavorite && (
@@ -195,12 +168,6 @@ export const AlbumPage = () => {
           )}
         </div>
       </div>
-      {showConfirmDelete && (
-        <ConfirmDeleteModal 
-          onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-        />
-      )}
     </div>
   );
 };

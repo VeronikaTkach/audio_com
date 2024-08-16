@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { supabase } from '../../../supabaseClient';
 import { Button } from '../../components/ui/Button';
+import { DeleteAlbumButton } from '../../components/ui/Button';
+import { EditAlbumButton } from '../../components/ui/Button';
 import s from './styles.module.scss';
 
 export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
@@ -70,14 +72,16 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
       </div>
       {isEditor && (
         <div className={s.album__actions}>
-          <Button 
-            label="Edit" 
-            onClick={(e) => { e.stopPropagation(); onEdit(album.id); }} 
-            className={s.album__button} 
+          <EditAlbumButton 
+            albumId={album.id}
+            onEdit={onEdit}
+            className={s.album__button}
           />
-          <Button 
-            label="Delete" 
-            onClick={(e) => { e.stopPropagation(); onDelete(album.id); }} 
+          <DeleteAlbumButton 
+            albumId={album.id}
+            onDelete={() => {
+              onDelete(album.id); 
+            }} 
             className={s.album__button} 
           />
         </div>

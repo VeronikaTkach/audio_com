@@ -3,7 +3,7 @@ import { Button } from '../../ui/Button';
 import { ConfirmDeleteModal } from '../../ui/ConfirmDeleteModal';
 import { supabase } from '../../../../supabaseClient';
 
-export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className }) => {
+export const DeleteAlbumButton = ({ albumId, onDelete, className }) => { // Убрали refreshAlbums из пропсов
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
@@ -43,17 +43,9 @@ export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className 
         // Принудительно скрываем модальное окно после закрытия алерта
         setShowConfirmDelete(false);
 
-        // Обновляем список альбомов после успешного удаления
-        if (refreshAlbums) {
-          refreshAlbums();
-        }
-
-        if (onDelete) {
-          onDelete(albumId);
-        }
-
-        // Показать алерт и обновить страницу после его закрытия
+        // Перезагрузка страницы после успешного удаления
         alert('Album deleted successfully!');
+        // window.location.reload(); // Перезагрузка страницы
       }
     } catch (error) {
       console.error('Error deleting album:', error);

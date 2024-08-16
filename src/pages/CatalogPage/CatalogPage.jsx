@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } from '../../core/store/albumsSlice';
-import { supabase } from '../../../supabaseClient';
+import { fetchAlbums, setSearchTerm, setCurrentPage } from '../../core/store/albumsSlice'; // Убрали resetAlbums и deleteAlbum
 import { SearchInput } from '../../components/ui/SearchInput';
-import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Filters } from '../../components/ui/Filters';
 import { Button } from '../../components/ui/Button';
 import { AlbumItem } from '../../components/AlbumItem/AlbumItem';
@@ -27,7 +25,7 @@ export const CatalogPage = () => {
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
-    dispatch(resetAlbums());
+    console.log('Fetching new album list...');
     dispatch(fetchAlbums({ 
       page: 1, 
       perPage: albumsPerPage, 
@@ -38,33 +36,14 @@ export const CatalogPage = () => {
     }));
   }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear, selectedFormats]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
-        dispatch(setCurrentPage(currentPage + 1));
-        dispatch(fetchAlbums({ 
-          page: currentPage + 1, 
-          perPage: albumsPerPage, 
-          searchTerm, 
-          genre: selectedGenre?.value, 
-          year: selectedYear?.value, 
-          formats: selectedFormats.map(f => f.value)
-        }));
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats]);
-
   const handleSearch = (term) => {
+    console.log('Setting search term:', term);
     dispatch(setSearchTerm(term));
   };
 
   const handleGenreChange = (selectedOption) => {
+    console.log('Selected genre:', selectedOption);
     setSelectedGenre(selectedOption);
-    dispatch(resetAlbums());
     dispatch(fetchAlbums({ 
       page: 1, 
       perPage: albumsPerPage, 
@@ -76,8 +55,8 @@ export const CatalogPage = () => {
   };
   
   const handleYearChange = (selectedOption) => {
+    console.log('Selected year:', selectedOption);
     setSelectedYear(selectedOption);
-    dispatch(resetAlbums());
     dispatch(fetchAlbums({ 
       page: 1, 
       perPage: albumsPerPage, 
@@ -89,8 +68,8 @@ export const CatalogPage = () => {
   };
 
   const handleFormatChange = (selectedOptions) => {
+    console.log('Selected formats:', selectedOptions);
     setSelectedFormats(selectedOptions || []);
-    dispatch(resetAlbums());
     dispatch(fetchAlbums({ 
       page: 1, 
       perPage: albumsPerPage, 
@@ -102,77 +81,41 @@ export const CatalogPage = () => {
   };
 
   const resetAllFilters = () => {
+    console.log('Resetting all filters...');
     setSelectedGenre(null);
     setSelectedYear(null);
     setSelectedFormats([]);
-    dispatch(resetAlbums());
     dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null, formats: [] }));
   };
 
   const handleAlbumClick = (id) => {
+    console.log('Album clicked:', id);
     navigate(`/album/${id}`);
   };
 
   const handleEditClick = (id) => {
+    console.log('Edit album:', id);
     navigate(`/album/edit/${id}`);
   };
 
   const handleDeleteClick = async (id) => {
+    console.log('Delete album click:', id);
     setSelectedAlbumId(id);
     setShowConfirmDelete(true);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-        await supabase
-            .from('format_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
-
-        await supabase
-            .from('genre_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
-
-        const { data: albumData, error: albumError } = await supabase
-            .from('albums')
-            .delete()
-            .eq('id', selectedAlbumId)
-            .select()
-            .single();
-
-        if (albumError) {
-            throw new Error(albumError.message);
-        }
-
-        if (albumData.image) {
-            const coverPath = `covers/${albumData.artist}/${albumData.title}`;
-            const { error: storageError } = await supabase.storage
-                .from('album_covers')
-                .remove([coverPath]);
-
-            if (storageError) {
-                throw new Error(storageError.message);
-            }
-        }
-
-        dispatch(deleteAlbum(selectedAlbumId));
-        setShowConfirmDelete(false);
-        setSelectedAlbumId(null);
-
-    } catch (error) {
-        console.error('Error deleting album:', error.message);
-    }
-  };
-
   const handleCancelDelete = () => {
+    console.log('Cancel delete');
     setShowConfirmDelete(false);
     setSelectedAlbumId(null);
   };
 
   const handleNewAlbumClick = () => {
+    console.log('Create new album');
     navigate('/album/new');
   };
+
+  console.log('Rendering albums:', albums);
 
   return (
     <div className={s.container}>
@@ -190,7 +133,7 @@ export const CatalogPage = () => {
         <div className={s.container__actions}>
           <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
           {user && user.isEditor && (
-            <Button label="CreateNew Album" onClick={handleNewAlbumClick} />
+            <Button label="Create New Album" onClick={handleNewAlbumClick} />
           )}
         </div>
       </div>
@@ -208,7 +151,7 @@ export const CatalogPage = () => {
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal
-          onConfirm={handleConfirmDelete}
+          onConfirm={() => window.location.reload()} // Перезагружаем страницу после удаления
           onCancel={handleCancelDelete}
         />
       )}

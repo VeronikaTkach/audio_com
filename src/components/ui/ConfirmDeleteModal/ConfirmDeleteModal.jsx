@@ -5,14 +5,29 @@ import { Portal } from '../../Portal';
 import s from './styles.module.scss';
 
 export const ConfirmDeleteModal = ({ onConfirm, onCancel }) => {
+
+  const handleConfirmClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    onConfirm();
+  };
+
+  const handleCancelClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    onCancel();
+  };
+
   return (
     <Portal>
       <div className={s.modal}>
         <div className={s.modal__content}>
           <p style={{color: '#252f3f'}}>Are you sure you want to delete?</p>
           <div className={s.modal__actions}>
-            <Button label="Yes!" onClick={onConfirm}/>
-            <Button label="Cancel" onClick={onCancel}/>
+            <Button label="Yes!" onClick={handleConfirmClick} />
+            <Button label="Cancel" onClick={handleCancelClick} />
           </div>
         </div>
       </div>
