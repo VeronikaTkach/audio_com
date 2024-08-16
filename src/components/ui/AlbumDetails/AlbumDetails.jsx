@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '../../ui/Button';
 import s from '../../../pages/AlbumPage/styles.module.scss';
 
-export const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onAddToFavorites }) => {
+const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onAddToFavorites }) => {
   return (
     <div className={s.album__details}>
       <h2>{album.title}</h2>
@@ -27,3 +27,5 @@ export const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteCli
     </div>
   );
 };
+
+export default AlbumDetails;

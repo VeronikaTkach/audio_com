@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
-import { Button } from '../../components/ui/Button';
-import { AlbumDetails } from '../../components/ui/AlbumDetails/AlbumDetails';
 import { deleteAlbum } from '../../core/store/albumsSlice';
+import defaultCover from '../../assets/photo.png'
 import s from './styles.module.scss';
+
+const AlbumDetails = lazy(() => import('../../components/ui/AlbumDetails/AlbumDetails'))
 
 export const AlbumPage = () => {
   const { albumId } = useParams();
@@ -42,7 +43,7 @@ export const AlbumPage = () => {
           data.format = JSON.parse(data.format);
         }
         setAlbum(data);
-        setLoadingState('loaded'); // Устанавливаем статус загрузки как "loaded"
+        setLoadingState('loaded');
         console.log("Fetched album:", data);
       }
     };
@@ -111,15 +112,14 @@ export const AlbumPage = () => {
         }
 
         dispatch(deleteAlbum(selectedAlbumId));
-        setShowConfirmDelete(false); // Закрываем модальное окно
+        setShowConfirmDelete(false);
         setSelectedAlbumId(null);
-        setLoadingState('deleted'); // Устанавливаем статус загрузки как "deleted"
+        setLoadingState('deleted');
 
-        // Используем небольшой таймаут перед вызовом alert
         setTimeout(() => {
             alert('Album has been successfully deleted!');
             navigate('/catalog');
-        }, 100); // 100 мс достаточно для завершения обновления состояния
+        }, 100);
 
     } catch (error) {
         console.error('Error deleting album:', error.message);
@@ -167,25 +167,32 @@ export const AlbumPage = () => {
     }
   };
 
-  if (!album) {
-    if (loadingState === 'deleted') {
-      return <div>Delete...</div>;
-    }
-    return <div>Loading...</div>;
+  if (loadingState === 'deleted') {
+    return <div>Deleted...</div>;
   }
 
   return (
     <div className={s.album__page}>
       <div className={s.album__content}>
-        <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
-        <AlbumDetails 
-          album={album} 
-          user={user} 
-          isFavorite={isFavorite} 
-          onEditClick={handleEditClick} 
-          onDeleteClick={() => handleDeleteClick(albumId)} 
-          onAddToFavorites={handleAddToFavorites} 
+        <img 
+          src={album?.image ? album.image : defaultCover} 
+          alt={`${album?.title || 'Default'} cover`} 
+          className={s.album__image}
         />
+        {album ? (
+          <Suspense fallback={<div>Loading album details...</div>}>
+            <AlbumDetails 
+              album={album} 
+              user={user} 
+              isFavorite={isFavorite} 
+              onEditClick={handleEditClick} 
+              onDeleteClick={() => handleDeleteClick(albumId)} 
+              onAddToFavorites={handleAddToFavorites} 
+            />
+          </Suspense>
+        ) : (
+          <div>Loading...</div>
+        )}
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal 
@@ -196,3 +203,4 @@ export const AlbumPage = () => {
     </div>
   );
 };
+
