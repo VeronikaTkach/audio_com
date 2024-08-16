@@ -33,3 +33,18 @@
     }
   }
 }
+
+.noalbumsfound{
+  &__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+  }
+
+  &__text {
+    text-align: center;
+    font-size: 32px;
+    color: var(--text-color);
+  }
+}

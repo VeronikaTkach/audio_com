@@ -194,17 +194,21 @@ export const CatalogPage = () => {
           )}
         </div>
       </div>
-      <div className={s.catalog__albums__list}>
-          {albums.map(album => (
-            <AlbumItem 
-              key={album.id} 
-              album={album} 
-              onClick={handleAlbumClick} 
-              onEdit={handleEditClick} 
-              onDelete={handleDeleteClick} 
-              isEditor={user && user.isEditor}
-            />
-          ))}
+      <div className={albums.length === 0 ? s.noalbumsfound__container : s.catalog__albums__list}>
+          {albums.length === 0 ? (
+            <div className={s.noalbumsfound__text}>Albums not found</div>
+          ) : (
+            albums.map(album => (
+              <AlbumItem 
+                key={album.id} 
+                album={album} 
+                onClick={handleAlbumClick} 
+                onEdit={handleEditClick} 
+                onDelete={handleDeleteClick} 
+                isEditor={user && user.isEditor}
+              />
+            ))
+          )}
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal
