@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
-import { Button } from '../../components/ui/Button/Button';
-import { deleteAlbum } from '../../core/store/albumsSlice'; // Добавим этот импорт
+import { Button } from '../../components/ui/Button';
+import { AlbumDetails } from '../../components/ui/AlbumDetails/AlbumDetails';
+import { deleteAlbum } from '../../core/store/albumsSlice';
 import s from './styles.module.scss';
 
 export const AlbumPage = () => {
@@ -13,7 +14,7 @@ export const AlbumPage = () => {
   const [album, setAlbum] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [loadingState, setLoadingState] = useState('loading'); // Добавляем состояние для отслеживания статуса загрузки
+  const [loadingState, setLoadingState] = useState('loading');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
@@ -177,27 +178,14 @@ export const AlbumPage = () => {
     <div className={s.album__page}>
       <div className={s.album__content}>
         <img src={album.image} alt={`${album.title} cover`} className={s.album__image}/>
-        <div className={s.album__details}>
-          <h2>{album.title}</h2>
-          <h3>{album.artist}</h3>
-          <p><strong>Genre: </strong>{album.genre.join(', ')}</p>
-          <p><strong>Release Date:</strong> {album.release_date}</p>
-          <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
-          <p><strong>Description:</strong> {album.description}</p>
-          <p><strong>Format:</strong> {album.format.join(', ')}</p>
-          {user && user.isEditor && (
-            <div className={s.album__actions}>
-              <Button label="Edit" onClick={handleEditClick}/>
-              <Button label="Delete" onClick={() => handleDeleteClick(albumId)}/> {/* Используем albumId */}
-            </div>
-          )}
-          {user && !user.isEditor && !isFavorite && (
-            <Button label="Add to Favorites" onClick={handleAddToFavorites}/>
-          )}
-          {user && !user.isEditor && isFavorite && (
-            <p>This album is already in your favorites.</p>
-          )}
-        </div>
+        <AlbumDetails 
+          album={album} 
+          user={user} 
+          isFavorite={isFavorite} 
+          onEditClick={handleEditClick} 
+          onDeleteClick={() => handleDeleteClick(albumId)} 
+          onAddToFavorites={handleAddToFavorites} 
+        />
       </div>
       {showConfirmDelete && (
         <ConfirmDeleteModal 
