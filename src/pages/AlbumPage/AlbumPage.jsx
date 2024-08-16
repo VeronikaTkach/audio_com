@@ -13,6 +13,7 @@ export const AlbumPage = () => {
   const [album, setAlbum] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingState, setLoadingState] = useState('loading'); // Добавляем состояние для отслеживания статуса загрузки
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
@@ -40,6 +41,7 @@ export const AlbumPage = () => {
           data.format = JSON.parse(data.format);
         }
         setAlbum(data);
+        setLoadingState('loaded'); // Устанавливаем статус загрузки как "loaded"
         console.log("Fetched album:", data);
       }
     };
@@ -75,19 +77,16 @@ export const AlbumPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-        // Удаляем все записи из таблицы format_album, связанные с удаляемым альбомом
         await supabase
             .from('format_album')
             .delete()
             .eq('album_id', selectedAlbumId);
 
-        // Удаляем все записи из таблицы genre_album, связанные с удаляемым альбомом
         await supabase
             .from('genre_album')
             .delete()
             .eq('album_id', selectedAlbumId);
 
-        // Теперь удаляем сам альбом из таблицы albums
         const { data: albumData, error: albumError } = await supabase
             .from('albums')
             .delete()
@@ -99,7 +98,6 @@ export const AlbumPage = () => {
             throw new Error(albumError.message);
         }
 
-        // Удаляем обложку альбома из хранилища, если она существует
         if (albumData.image) {
             const coverPath = `covers/${albumData.artist}/${albumData.title}`;
             const { error: storageError } = await supabase.storage
@@ -111,13 +109,16 @@ export const AlbumPage = () => {
             }
         }
 
-        // Обновляем состояние, удаляя альбом из списка
         dispatch(deleteAlbum(selectedAlbumId));
-        setShowConfirmDelete(false);
+        setShowConfirmDelete(false); // Закрываем модальное окно
         setSelectedAlbumId(null);
+        setLoadingState('deleted'); // Устанавливаем статус загрузки как "deleted"
 
-        // Перенаправление на каталог после успешного удаления
-        navigate('/catalog');
+        // Используем небольшой таймаут перед вызовом alert
+        setTimeout(() => {
+            alert('Album has been successfully deleted!');
+            navigate('/catalog');
+        }, 100); // 100 мс достаточно для завершения обновления состояния
 
     } catch (error) {
         console.error('Error deleting album:', error.message);
@@ -165,9 +166,12 @@ export const AlbumPage = () => {
     }
   };
 
-  if (!album) return <div>Loading...</div>;
-
-  console.log("Album image URL:", album.image);
+  if (!album) {
+    if (loadingState === 'deleted') {
+      return <div>Delete...</div>;
+    }
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={s.album__page}>
