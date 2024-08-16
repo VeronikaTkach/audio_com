@@ -6,6 +6,7 @@ import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
 import { fetchGenres } from '../../core/store/genresSlice';
 import { fetchAlbums } from '../../core/store/albumsSlice';
+import defaultCover from '../../assets/defaultCover.webp';
 import s from './styles.module.scss';
 
 export const AddNewAlbumPage = () => {
@@ -186,6 +187,9 @@ export const AddNewAlbumPage = () => {
       }
 
       imageUrl = publicUrlResponse.publicUrl;
+    } else {
+      // Используем изображение по умолчанию
+      imageUrl = defaultCover;
     }
 
     try {

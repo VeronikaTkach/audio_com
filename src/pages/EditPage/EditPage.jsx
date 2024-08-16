@@ -155,42 +155,46 @@ export const EditPage = () => {
 
   const handleSaveChanges = async () => {
     const { title, artist, description, format, genre, image, release_date, value_of_tracks } = album;
-
+   
     try {
       // Сначала сохраняем жанры и получаем их IDs
       const genreIds = await saveGenres(genre);
       const formatIds = await saveFormats(format);
-
+   
       if (imageFile) {
+        // Если было выбрано новое изображение, загружаем его
         const coverPath = createCoverPath(album.artist, album.title);
-
+   
         const { data: uploadResponse, error: uploadError } = await supabase
           .storage
           .from('album_covers')
           .upload(coverPath, imageFile, {
             upsert: true
           });
-
+   
         if (uploadError) {
           console.error('Error uploading image:', uploadError);
           setError('Error uploading image: ' + uploadError.message);
           return;
         }
-
-        const { data: publicUrlResponse } = supabase
+   
+        const { data: publicUrlResponse, error: urlError } = supabase
           .storage
           .from('album_covers')
           .getPublicUrl(coverPath);
-
-        if (publicUrlResponse.error) {
-          console.error('Error getting public URL:', publicUrlResponse.error);
-          setError('Error getting public URL: ' + publicUrlResponse.error.message);
+   
+        if (urlError) {
+          console.error('Error getting public URL:', urlError);
+          setError('Error getting public URL: ' + urlError.message);
           return;
         }
-
+   
         album.image = publicUrlResponse.publicUrl;
+      } else if (!album.image || album.image === originalAlbum.image) {
+        // Если изображение не выбрано или удалено, используем defaultCover
+        album.image = defaultCover;
       }
-
+   
       // Обновляем альбом в таблице albums
       const { data: updatedAlbum, error: updateError } = await supabase
         .from('albums')
@@ -200,47 +204,47 @@ export const EditPage = () => {
           description,
           format,
           genre,
-          image,
+          image: album.image,
           release_date,
           value_of_tracks
         })
         .eq('id', albumId)
         .select()
         .single();
-
+   
       if (updateError) {
         console.error('Error updating album:', updateError.message);
         setError('Error updating album: ' + updateError.message);
         return;
       }
-
+   
       // Удаляем старые связи альбома с жанрами в таблице genre_album
       await supabase
         .from('genre_album')
         .delete()
         .eq('album_id', albumId);
-
+   
       // Добавляем новые связи альбома с жанрами
       for (const genreId of genreIds) {
         await supabase
           .from('genre_album')
           .insert({ album_id: albumId, genre_id: genreId });
       }
-
+   
       for (const formatId of formatIds) {
         await supabase
           .from('format_album')
           .insert({ album_id: albumId, format_id: formatId });
       }
-
+   
       alert('Album updated successfully!');
       navigate(`/album/${albumId}`);
-
+   
     } catch (err) {
       console.error('Error updating album:', err.message);
       setError('Error updating album: ' + err.message);
-    }
-  };
+    }  
+  }; 
 
   const handleCancel = () => {
     if (JSON.stringify(album) !== JSON.stringify(originalAlbum)) {
