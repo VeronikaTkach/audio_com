@@ -1,8 +1,41 @@
 .catalog {
   &__search {
+    min-width: 350px;
+    min-height: 36px;
     border-radius: 7px;
+    padding-left: 35px; /* Отступ для иконки поиска слева */
+    padding-right: 35px; /* Отступ для иконки фильтров справа */
     height: 28px;
-    padding-left: 10px;
+    padding-left: 40px;
     border: solid 1px var(--text-color);
+  }
+  &__search__icon {
+    position: absolute;
+    left: 10px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #252f3f;
+  }
+  &__searchContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  &__filterButton {
+    position: absolute;
+    right: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #252f3f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:focus {
+      outline: none;
+    }
   }
 }
