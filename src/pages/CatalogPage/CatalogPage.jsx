@@ -15,6 +15,7 @@ export const CatalogPage = () => {
   const navigate = useNavigate();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showFiltersPopup, setShowFiltersPopup] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedFormats, setSelectedFormats] = useState([]);
@@ -174,26 +175,36 @@ export const CatalogPage = () => {
     navigate('/album/new');
   };
 
+  const toggleFiltersPopup = () => {
+    setShowFiltersPopup(prev => !prev);
+  };
+
   return (
     <div className={s.container}>
       <h1>Albums</h1>
       <div className={s.container__header}>
-        <Filters
-          selectedGenre={selectedGenre}
-          handleGenreChange={handleGenreChange}
-          selectedYear={selectedYear}
-          handleYearChange={handleYearChange}
-          selectedFormats={selectedFormats}
-          handleFormatChange={handleFormatChange}
-          resetAllFilters={resetAllFilters}
-        />
-        <div className={s.container__actions}>
-          <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} />
-          {user && user.isEditor && (
-            <Button label="CreateNew Album" onClick={handleNewAlbumClick} />
-          )}
-        </div>
+        <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} onToggleFilters={toggleFiltersPopup} />
+        {user && user.isEditor && (
+          <Button label="Create New Album" onClick={handleNewAlbumClick} />
+        )}
       </div>
+      {showFiltersPopup && (
+        <div className={s.filters__popup}>
+          <div className={s.filters__popup__header}>
+            <h2>Filters</h2>
+            <Button label={'x'} className={s.filters__closePopupButton} onClick={toggleFiltersPopup}/>
+          </div>
+          <Filters
+            selectedGenre={selectedGenre}
+            handleGenreChange={handleGenreChange}
+            selectedYear={selectedYear}
+            handleYearChange={handleYearChange}
+            selectedFormats={selectedFormats}
+            handleFormatChange={handleFormatChange}
+            resetAllFilters={resetAllFilters}
+          />
+        </div>
+      )}
       <div className={albums.length === 0 ? s.noalbumsfound__container : s.catalog__albums__list}>
           {albums.length === 0 ? (
             <div className={s.noalbumsfound__text}>Albums not found</div>

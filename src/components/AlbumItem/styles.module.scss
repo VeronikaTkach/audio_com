@@ -8,7 +8,8 @@
     gap: 20px;
     cursor: pointer;
     transition: box-shadow 0.3s ease-in-out;
-
+    min-width: 500px;
+    
     &:hover {
       box-shadow: 0 0 10px 5px var(--text-color);
     }

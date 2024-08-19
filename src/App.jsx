@@ -30,15 +30,17 @@ function App() {
   return (
       <div className={`App ${currentTheme}`}>
         <Header onOpenAuthModal={handleOpenAuthModal} />
-        <Routes>
-          <Route path="/" element={<Navigate to="/catalog" />} />
-          <Route path="/catalog" element={<CatalogPage />} />
-          <Route path="/album/:albumId" element={<AlbumPage />} />
-          <Route path="/album/edit/:albumId" element={<EditPage />} />
-          <Route path="/auth" element={<Authentification onClose={handleCloseAuthModal} />} />
-          <Route path="/album/new" element={<AddNewAlbumPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-        </Routes>
+        <div className='routes'>
+          <Routes>
+            <Route path="/" element={<Navigate to="/catalog" />} />
+            <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/album/:albumId" element={<AlbumPage />} />
+            <Route path="/album/edit/:albumId" element={<EditPage />} />
+            <Route path="/auth" element={<Authentification onClose={handleCloseAuthModal} />} />
+            <Route path="/album/new" element={<AddNewAlbumPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+          </Routes>
+        </div>
       </div>
   );
 }

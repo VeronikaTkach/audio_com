@@ -41,3 +41,10 @@
   --input-color: #fffcf2;
   --checkbox-color-checked: #e9764b;
 }
+
+.routes {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  flex-wrap: wrap;
+}
