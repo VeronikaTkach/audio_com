@@ -1,6 +1,7 @@
-запуск проекта npm run dev
+project launch npm run dev
 
-деплой vercel --prod
+deploy vercel --prod
 
-прод https://audio-39rzxyqeq-veronikas-projects-a77b08dd.vercel.app
+production https://audio-39rzxyqeq-veronikas-projects-a77b08dd.vercel.app
 
+the backend part is done using the service supabase
