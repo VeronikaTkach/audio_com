@@ -17,6 +17,7 @@
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "classnames": "^2.5.1",
+    "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

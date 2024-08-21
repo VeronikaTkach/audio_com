@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { debounce } from 'lodash';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
@@ -28,17 +29,24 @@ export const CatalogPage = () => {
   const hasMoreAlbums = useSelector(state => state.albums.hasMoreAlbums);
   const user = useSelector(state => state.user.user);
 
+  const debouncedFetchAlbums = useCallback(
+    debounce((searchTerm, genre, year, formats) => {
+      dispatch(resetAlbums());
+      dispatch(fetchAlbums({ 
+        page: 1, 
+        perPage: albumsPerPage, 
+        searchTerm, 
+        genre, 
+        year, 
+        formats 
+      }));
+    }, 300),
+    [dispatch, albumsPerPage]
+  );
+
   useEffect(() => {
-    dispatch(resetAlbums());
-    dispatch(fetchAlbums({ 
-      page: 1, 
-      perPage: albumsPerPage, 
-      searchTerm, 
-      genre: selectedGenre?.value, 
-      year: selectedYear?.value, 
-      formats: selectedFormats.map(f => f.value) 
-    }));
-  }, [dispatch, searchTerm, albumsPerPage, selectedGenre, selectedYear, selectedFormats]);
+    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
+  }, [searchTerm, selectedGenre, selectedYear, selectedFormats, debouncedFetchAlbums]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,49 +74,24 @@ export const CatalogPage = () => {
 
   const handleGenreChange = (selectedOption) => {
     setSelectedGenre(selectedOption);
-    dispatch(resetAlbums());
-    dispatch(fetchAlbums({ 
-      page: 1, 
-      perPage: albumsPerPage, 
-      searchTerm, 
-      genre: selectedOption?.value, 
-      year: selectedYear?.value,
-      formats: selectedFormats.map(f => f.value),
-    }));
+    debouncedFetchAlbums(searchTerm, selectedOption?.value, selectedYear?.value, selectedFormats.map(f => f.value));
   };
   
   const handleYearChange = (selectedOption) => {
     setSelectedYear(selectedOption);
-    dispatch(resetAlbums());
-    dispatch(fetchAlbums({ 
-      page: 1, 
-      perPage: albumsPerPage, 
-      searchTerm, 
-      genre: selectedGenre?.value, 
-      year: selectedOption?.value,
-      formats: selectedFormats.map(f => f.value), 
-    }));
+    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedOption?.value, selectedFormats.map(f => f.value));
   };
 
   const handleFormatChange = (selectedOptions) => {
     setSelectedFormats(selectedOptions || []);
-    dispatch(resetAlbums());
-    dispatch(fetchAlbums({ 
-      page: 1, 
-      perPage: albumsPerPage, 
-      searchTerm, 
-      genre: selectedGenre?.value, 
-      year: selectedYear?.value,
-      formats: (selectedOptions || []).map(f => f.value),
-    }));
+    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, (selectedOptions || []).map(f => f.value));
   };
 
   const resetAllFilters = () => {
     setSelectedGenre(null);
     setSelectedYear(null);
     setSelectedFormats([]);
-    dispatch(resetAlbums());
-    dispatch(fetchAlbums({ page: 1, perPage: albumsPerPage, searchTerm: '', genre: null, year: null, formats: [] }));
+    debouncedFetchAlbums('', null, null, []);
   };
 
   const handleAlbumClick = (id) => {
