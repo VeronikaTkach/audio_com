@@ -25,6 +25,7 @@ export const CatalogPage = () => {
   const currentPage = useSelector(state => state.albums.currentPage);
   const albumsPerPage = useSelector(state => state.albums.albumsPerPage);
   const status = useSelector(state => state.albums.status);
+  const hasMoreAlbums = useSelector(state => state.albums.hasMoreAlbums);
   const user = useSelector(state => state.user.user);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const CatalogPage = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading') {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading' && hasMoreAlbums) {
         dispatch(setCurrentPage(currentPage + 1));
         dispatch(fetchAlbums({ 
           page: currentPage + 1, 
@@ -57,7 +58,7 @@ export const CatalogPage = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats]);
+  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats, hasMoreAlbums]);
 
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));

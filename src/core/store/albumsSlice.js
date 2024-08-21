@@ -109,6 +109,7 @@ const albumsSlice = createSlice({
     searchTerm: '',
     currentPage: 1,
     albumsPerPage: 10,
+    hasMoreAlbums: true,
   },
   reducers: {
     setSearchTerm(state, action) {
@@ -124,6 +125,7 @@ const albumsSlice = createSlice({
     resetAlbums(state) {
       state.items = [];
       state.status = 'idle';
+      state.hasMoreAlbums = true;
     }
   },
   extraReducers: (builder) => {
@@ -137,6 +139,7 @@ const albumsSlice = createSlice({
           state.items = action.payload;
         } else {
           state.items = [...state.items, ...action.payload];
+          state.hasMoreAlbums = action.payload.length === state.albumsPerPage;
         }
       })
       .addCase(fetchAlbums.rejected, (state, action) => {
