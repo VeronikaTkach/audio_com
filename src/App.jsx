@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import ThemeToggle from './assets/styles/themes/ThemeToggle'
 import { selectTheme } from './assets/styles/themes/slice'
 import { CatalogPage } from './pages/CatalogPage/CatalogPage'
 import { AlbumPage } from './pages/AlbumPage/AlbumPage'
@@ -40,6 +39,9 @@ function App() {
             <Route path="/album/new" element={<AddNewAlbumPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
           </Routes>
+          {isAuthModalOpen && (
+              <Authentification onClose={handleCloseAuthModal}/>
+          )}
         </div>
       </div>
   );
