@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { supabase } from '../../../supabaseClient';
 import { Button } from '../../components/ui/Button';
+import { FaRegStar, FaStar } from 'react-icons/fa';
 import s from './styles.module.scss';
 
 export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
@@ -29,6 +30,12 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
 
   const handleAddToFavorites = async () => {
     if (user) {
+
+      if (isFavorite) {
+        alert('Album is already added in Favorites.');
+        return;
+      }
+
       const { data: albumData, error: albumError } = await supabase
         .from('albums')
         .select('title, artist, image')
@@ -68,26 +75,30 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         <div className={s.album__artist}>{album.artist}</div>
         <div className={s.album__title}>{album.title}</div>
       </div>
-      {isEditor && (
-        <div className={s.album__actions}>
-          <Button 
-            label="Edit" 
-            onClick={(e) => { e.stopPropagation(); onEdit(album.id); }} 
-            className={s.album__button} 
-          />
-          <Button 
-            label="Delete" 
-            onClick={(e) => { e.stopPropagation(); onDelete(album.id); }} 
-            className={s.album__button} 
-          />
-        </div>
-      )}
-      {user && !user.isEditor && !isFavorite && (
-        <Button label="Add to Favorites" onClick={(e) => { e.stopPropagation(); handleAddToFavorites(); }}/>
-      )}
-      {user && !user.isEditor && isFavorite && (
-        <p>This album is already in <br/> your favorites.</p>
-      )}
+      <div className={s.album__actions}>
+        {user && (
+          <div 
+            className={s.favorite__icon} 
+            onClick={(e) => { e.stopPropagation(); handleAddToFavorites(); }}
+          >
+            {isFavorite ? <FaStar size={24} color="gold" /> : <FaRegStar size={24} color="gold" />}
+          </div>
+        )}
+        {isEditor && (
+          <div className={s.album__actions}>
+            <Button 
+              label="Edit" 
+              onClick={(e) => { e.stopPropagation(); onEdit(album.id); }} 
+              className={s.album__button} 
+            />
+            <Button 
+              label="Delete" 
+              onClick={(e) => { e.stopPropagation(); onDelete(album.id); }} 
+              className={s.album__button} 
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

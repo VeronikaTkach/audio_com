@@ -1,12 +1,28 @@
 import React from 'react';
 import { Button } from '../../ui/Button';
 import s from '../../../pages/AlbumPage/styles.module.scss';
+import { FaRegStar, FaStar } from 'react-icons/fa';
 
 const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onAddToFavorites }) => {
+  const handleAddToFavoritesClick = () => {
+    if (isFavorite) {
+      alert('Album is already added in Favorites.');
+      return;
+    }
+    onAddToFavorites();
+  };
+  
   return (
     <div className={s.album__details}>
-      <h2>{album.title}</h2>
-      <h3>{album.artist}</h3>
+      <div className={s.album__fav}>
+        <h1>{album.title}</h1>
+        {user && (
+        <div className={s.favorite__icon} onClick={handleAddToFavoritesClick}>
+          {isFavorite ? <FaStar size={36} color="gold" /> : <FaRegStar size={36} color="gold" />}
+        </div>
+      )}
+      </div>
+      <h2>{album.artist}</h2>
       <p><strong>Genre: </strong>{album.genre.join(', ')}</p>
       <p><strong>Release Date:</strong> {album.release_date}</p>
       <p><strong>Tracks:</strong> {album.value_of_tracks}</p>
@@ -17,12 +33,6 @@ const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onA
           <Button label="Edit" onClick={onEditClick}/>
           <Button label="Delete" onClick={onDeleteClick}/>
         </div>
-      )}
-      {user && !user.isEditor && !isFavorite && (
-        <Button label="Add to Favorites" onClick={onAddToFavorites}/>
-      )}
-      {user && !user.isEditor && isFavorite && (
-        <p>This album is already in your favorites.</p>
       )}
     </div>
   );

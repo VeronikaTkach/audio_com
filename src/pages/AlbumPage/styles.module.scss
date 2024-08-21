@@ -24,4 +24,9 @@
     display: flex;
     gap: 20px;
   }
+  &__fav {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+  }
 }

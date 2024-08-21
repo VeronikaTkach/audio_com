@@ -80,7 +80,7 @@ export const FavoritesPage = () => {
 
   return (
     <div className={s.favorites__page}>
-      <h2>Your Favorites</h2>
+      <h1>Your Favorites</h1>
       {favorites.length > 0 ? (
         <table className={s.favorites__table}>
           <thead>
@@ -109,13 +109,13 @@ export const FavoritesPage = () => {
               </tr>
             ))}
           </tbody>
+          <div className={s.deleteAll}>
+            <Button label={'Delete All'} onClick={handleDeleteAllClick} className={s.delete_all__button}/>
+          </div>
         </table>
       ) : (
         <p>No favorites found.</p>
       )}
-      <div className={s.deleteAll}>
-        <Button label={'Delete All'} onClick={handleDeleteAllClick} className={s.delete_all__button}/>
-      </div>
       {showDeleteModal && (
         <ConfirmDeleteModal
           onConfirm={deleteItemId === 'all' ? handleConfirmDeleteAll : handleConfirmDelete}

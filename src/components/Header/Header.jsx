@@ -36,9 +36,7 @@ export const Header = () => {
       </div>
       {user ? (
         <div className={s.header__info}>
-          {!user.isEditor && (
-            <Button label="Favorites" onClick={handleFavoritesClick}/>
-          )}
+          <Button label="Favorites" onClick={handleFavoritesClick}/>
           <span>{user.email} ({user.isEditor ? 'Editor' : 'User'})</span>
           <Button label="Log out" onClick={handleLogout}/>
         </div>
