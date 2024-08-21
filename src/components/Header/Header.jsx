@@ -28,6 +28,10 @@ export const Header = () => {
     navigate('/favorites');
   };
 
+  const handleNewAlbumClick = () => {
+    navigate('/album/new');
+  };
+
   return (
     <div className={s.header}>
       <div className={s.header__actions}>
@@ -36,6 +40,9 @@ export const Header = () => {
       </div>
       {user ? (
         <div className={s.header__info}>
+          {user && user.isEditor && (
+            <Button label="Create New Album" onClick={handleNewAlbumClick} />
+          )}
           <Button label="Favorites" onClick={handleFavoritesClick}/>
           <span>{user.email} ({user.isEditor ? 'Editor' : 'User'})</span>
           <Button label="Log out" onClick={handleLogout}/>

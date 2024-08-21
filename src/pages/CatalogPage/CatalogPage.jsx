@@ -159,10 +159,6 @@ export const CatalogPage = () => {
     setSelectedAlbumId(null);
   };
 
-  const handleNewAlbumClick = () => {
-    navigate('/album/new');
-  };
-
   const toggleFiltersPopup = () => {
     setShowFiltersPopup(prev => !prev);
   };
@@ -172,9 +168,6 @@ export const CatalogPage = () => {
       <h1>Albums</h1>
       <div className={s.container__header}>
         <SearchInput searchTerm={searchTerm} handleSearch={handleSearch} onToggleFilters={toggleFiltersPopup} />
-        {user && user.isEditor && (
-          <Button label="Create New Album" onClick={handleNewAlbumClick} />
-        )}
       </div>
       {showFiltersPopup && (
         <div className={s.filters__popup}>
