@@ -74,16 +74,19 @@ export const CatalogPage = () => {
 
   const handleGenreChange = (selectedOption) => {
     setSelectedGenre(selectedOption);
+    dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedOption?.value, selectedYear?.value, selectedFormats.map(f => f.value));
   };
   
   const handleYearChange = (selectedOption) => {
     setSelectedYear(selectedOption);
+    dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedOption?.value, selectedFormats.map(f => f.value));
   };
 
   const handleFormatChange = (selectedOptions) => {
     setSelectedFormats(selectedOptions || []);
+    dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, (selectedOptions || []).map(f => f.value));
   };
 
@@ -91,6 +94,7 @@ export const CatalogPage = () => {
     setSelectedGenre(null);
     setSelectedYear(null);
     setSelectedFormats([]);
+    dispatch(setCurrentPage(1));
     debouncedFetchAlbums('', null, null, []);
   };
 
