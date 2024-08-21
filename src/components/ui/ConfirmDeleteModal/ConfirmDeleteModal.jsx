@@ -11,7 +11,7 @@ export const ConfirmDeleteModal = ({ onConfirm, onCancel }) => {
         <div className={s.modal__content}>
           <p style={{color: '#252f3f'}}>Are you sure you want to delete?</p>
           <div className={s.modal__actions}>
-            <Button label="Yes!" onClick={onConfirm}/>
+            <Button style={{backgroundColor: "red"}} label="Yes!" onClick={onConfirm}/>
             <Button label="Cancel" onClick={onCancel}/>
           </div>
         </div>
