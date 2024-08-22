@@ -16,7 +16,3 @@ LinkLikeButton.propTypes = {
   to: PropTypes.string.isRequired,
   className: PropTypes.string,
 };
-
-LinkLikeButton.defaultProps = {
-  className: '',
-};

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import s from './styles.module.scss';
 import { Button } from '../../components/ui/Button';
+import { AlbumItem } from '../../components/AlbumItem/AlbumItem';
 
 export const FavoritesPage = () => {
   const [favorites, setFavorites] = useState([]);
@@ -82,39 +83,33 @@ export const FavoritesPage = () => {
     <div className={s.favorites__page}>
       <h1>Your Favorites</h1>
       {favorites.length > 0 ? (
-        <table className={s.favorites__table}>
-          <thead>
-            <tr>
-              <th>Cover</th>
-              <th>Title</th>
-              <th>Artist</th>
-              <th>Album Page</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {favorites.map((fav) => (
-              <tr key={fav.id}>
-                <td>
-                  <img src={fav.image} alt={`${fav.title} cover`} className={s.favorites__image} />
-                </td>
-                <td style={{fontWeight:'bold'}}>{fav.title}</td>
-                <td style={{fontWeight:'bold'}}>{fav.artist}</td>
-                <td>
-                  <Button label={'Album Page'} onClick={() => handleAlbumPageClick(fav.album_id)} className={s.album__button}/>
-                </td>
-                <td>
-                  <Button label={'x'} onClick={() => handleDeleteClick(fav.id)} className={s.delete__button}/>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <div className={s.deleteAll}>
-            <Button label={'Delete All'} onClick={handleDeleteAllClick} className={s.delete_all__button}/>
-          </div>
-        </table>
+        <div className={s.favorites__list}>
+          {favorites.map((fav) => (
+            <div key={fav.id} className={s.favorites__item}>
+              <AlbumItem 
+                album={{ 
+                  id: fav.album_id, 
+                  title: fav.title, 
+                  artist: fav.artist, 
+                  image: fav.image 
+                }} 
+                onClick={() => handleAlbumPageClick(fav.album_id)}
+              />
+              <Button 
+                label={'Remove from Favorites'} 
+                onClick={() => handleDeleteClick(fav.id)} 
+                className={s.remove__button}
+              />
+            </div>
+          ))}
+        </div>
       ) : (
         <p>No favorites found.</p>
+      )}
+      {favorites.length > 0 && (
+        <div className={s.removeAll}>
+          <Button label={'Remove All'} onClick={handleDeleteAllClick} className={s.remove_all__button}/>
+        </div>
       )}
       {showDeleteModal && (
         <ConfirmDeleteModal

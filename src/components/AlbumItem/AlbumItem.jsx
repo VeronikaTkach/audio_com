@@ -17,7 +17,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
           .select('*')
           .eq('user_id', user.id)
           .eq('album_id', album.id)
-          .single();
+          .maybeSingle();
 
         if (data) {
           setIsFavorite(true);

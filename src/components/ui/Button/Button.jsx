@@ -15,7 +15,3 @@ Button.propTypes = {
   onClick: PropTypes.func.isRequired,
   className: PropTypes.string,
 };
-
-Button.defaultProps = {
-  className: '',
-};
