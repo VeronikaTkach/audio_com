@@ -23,9 +23,8 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, auto);
-    row-gap: 20px;
+    gap: 20px;
     width: 100%;
-    column-gap: 50px;
     @media (max-width: 950px) {
       grid-template-columns: 1fr;
       grid-template-rows: auto;
