@@ -10,8 +10,7 @@
     align-items: center;
     gap: 40px;
 
-    @media (max-width: 770px) {
-      // Скрываем переключатель темы в actions на малых экранах
+    @media (max-width: 1020px) {
       & > *:not(:first-child) {
         display: none;
       }
@@ -22,7 +21,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    @media (max-width: 770px) {
+    @media (max-width: 1020px) {
       display: none;
     }
   }
@@ -30,7 +29,7 @@
   &__desktopOnly {
     display: flex;
 
-    @media (max-width: 770px) {
+    @media (max-width: 1020px) {
       display: none;
     }
   }

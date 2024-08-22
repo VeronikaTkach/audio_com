@@ -8,15 +8,27 @@
     gap: 20px;
     cursor: pointer;
     transition: box-shadow 0.3s ease-in-out;
-    min-width: 500px;
-    
+
     &:hover {
       box-shadow: 0 0 10px 5px var(--text-color);
+    }
+
+    @media (min-width: 600px) {
+      min-width: 500px;
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      max-width: 300px;
     }
   }
   &__image {
     width: 150px;
     height: 150px;
+
+    @media (max-width: 600px) {
+      margin-bottom: 10px;
+    }
   }
   &__info {
     display: flex;
@@ -24,11 +36,20 @@
     justify-content: space-between;
     padding: 10px;
     align-items: center;
+
+    @media (max-width: 600px) {
+      width: 100%;
+      flex-direction: column;
+    }
   }
   &__artist {
     font-size: 1.2em;
     font-weight: bold;
     color: var(--text-color);
+
+    @media (max-width: 600px) {
+      margin-bottom: 5px;
+    }
   }
   &__title {
     font-size: 1em;
@@ -39,5 +60,11 @@
     flex-direction: column;
     justify-content: center;
     gap: 15px;
+
+    @media (max-width: 600px) {
+      flex-direction: row;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
   }
 }

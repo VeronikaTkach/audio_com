@@ -5,7 +5,7 @@ import ThemeToggle from '../../../assets/styles/themes/ThemeToggle';
 
 const BurgerIcon = styled.div`
   display: none;
-  @media (max-width: 770px) {
+  @media (max-width: 1020px) {
     display: block;
     cursor: pointer;
     width: 30px;

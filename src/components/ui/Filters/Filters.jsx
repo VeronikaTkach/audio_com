@@ -148,8 +148,8 @@ export const Filters = ({ selectedGenre, handleGenreChange, selectedYear, handle
         </div>
       </div>
       <div className={s.reset__buttonWrapper}>
-        <span style={{width: '205px'}}/>
-        <button 
+      <span className={s.filters__spacer}/>
+      <button 
           className={s.reset__button} 
           onClick={resetAllFilters}
         ></button>

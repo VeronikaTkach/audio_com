@@ -8,6 +8,18 @@
     align-items: start;
     flex-direction: column;
   }
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+  }
+
+  &__spacer {
+    width: 205px;
+
+    @media (max-width: 460px) {
+      width: 50px;
+    }
+  }
 }
 
 .dropdown {
