@@ -32,10 +32,10 @@ export const AlbumPage = () => {
         .from('albums')
         .select('*')
         .eq('id', albumId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        console.error('Error fetching album:', error);
+        throw new Error('Error fetching album');
       } else {
         if (typeof data.genre === 'string') {
           data.genre = JSON.parse(data.genre);
@@ -62,7 +62,7 @@ export const AlbumPage = () => {
           .select('*')
           .eq('user_id', user.id)
           .eq('album_id', albumId)
-          .single();
+          .maybeSingle();
 
         if (data) {
           setIsFavorite(true);
@@ -95,7 +95,7 @@ export const AlbumPage = () => {
             .delete()
             .eq('id', selectedAlbumId)
             .select()
-            .single();
+            .maybeSingle();
 
         if (albumError) {
             throw new Error(albumError.message);
@@ -142,7 +142,7 @@ export const AlbumPage = () => {
         .from('albums')
         .select('title, artist, image')
         .eq('id', albumId)
-        .single();
+        .maybeSingle();
 
       if (albumError) {
         console.error('Error fetching album details:', albumError);

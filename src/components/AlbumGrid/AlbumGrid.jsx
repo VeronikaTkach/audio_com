@@ -6,7 +6,14 @@ import { Button } from '../ui/Button/Button';
 import TextareaAutosize from 'react-textarea-autosize';
 import s from './styles.module.scss';
 
-export const AlbumGrid = ({ album, handleInputChange, handleImageChange, imageFile, fileName, isEdit }) => {
+export const AlbumGrid = ({
+  album,
+  handleInputChange,
+  handleImageChange = null,
+  imageFile = null,
+  fileName = '',
+  isEdit = false,
+}) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
 
   useEffect(() => {
@@ -149,11 +156,4 @@ AlbumGrid.propTypes = {
   imageFile: PropTypes.object,
   fileName: PropTypes.string,
   isEdit: PropTypes.bool
-};
-
-AlbumGrid.defaultProps = {
-  handleImageChange: null,
-  imageFile: null,
-  fileName: '',
-  isEdit: false
 };
