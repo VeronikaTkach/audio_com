@@ -29,6 +29,28 @@ export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className 
         .delete()
         .eq('album_id', albumId);
 
+      // Проверка и удаление из favorites
+      const { data: favoritesData, error: favoritesError } = await supabase
+        .from('favorites')
+        .select('id')
+        .eq('album_id', albumId);
+
+      if (favoritesError) {
+        console.error('Error fetching favorites:', favoritesError.message);
+      } else if (favoritesData.length > 0) {
+        // Если альбом есть в избранных, удалить его оттуда
+        const favoriteIds = favoritesData.map(fav => fav.id);
+        const { error: deleteFavoritesError } = await supabase
+          .from('favorites')
+          .delete()
+          .in('id', favoriteIds);
+
+        if (deleteFavoritesError) {
+          console.error('Error deleting from favorites:', deleteFavoritesError.message);
+          toast.error(`Failed to delete album from favorites: ${deleteFavoritesError.message}`);
+        }
+      }
+
       // Удаление альбома из таблицы albums
       const { error: albumError } = await supabase
         .from('albums')

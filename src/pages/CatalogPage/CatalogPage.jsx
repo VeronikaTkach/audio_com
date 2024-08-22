@@ -126,6 +126,11 @@ export const CatalogPage = () => {
             .delete()
             .eq('album_id', selectedAlbumId);
 
+        await supabase
+            .from('favorites')
+            .delete()
+            .eq('album_id', selectedAlbumId);
+
         const { data: albumData, error: albumError } = await supabase
             .from('albums')
             .delete()

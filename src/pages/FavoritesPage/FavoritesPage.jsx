@@ -25,11 +25,17 @@ export const FavoritesPage = () => {
         if (error) {
           console.error('Error fetching favorites:', error);
         } else {
-          setFavorites(data);
+          const updatedFavorites = data.map((fav) => {
+            const imageUrl = fav.image || supabase.storage.from('album_covers').getPublicUrl(`covers/${fav.artist}/${fav.title}`).publicUrl;
+            return {
+              ...fav,
+              image: imageUrl,
+            };
+          });
+          setFavorites(updatedFavorites);
         }
       }
     };
-
     fetchFavorites();
   }, [user]);
 
@@ -40,12 +46,33 @@ export const FavoritesPage = () => {
 
   const handleConfirmDelete = async () => {
     if (deleteItemId) {
-      await supabase
+      const { error } = await supabase
         .from('favorites')
         .delete()
         .eq('id', deleteItemId)
         .eq('user_id', user.id);
-      setFavorites(favorites.filter(fav => fav.id !== deleteItemId));
+
+      if (error) {
+        console.error('Error deleting from favorites:', error);
+      } else {
+        // Удаление альбома из состояния favorites
+        setFavorites(favorites.filter(fav => fav.id !== deleteItemId));
+        // Проверка на успешное удаление из Supabase
+        const { data: checkData, error: checkError } = await supabase
+          .from('favorites')
+          .select('*')
+          .eq('id', deleteItemId)
+          .eq('user_id', user.id);
+
+        if (checkError) {
+          console.error('Error checking deletion from favorites:', checkError);
+        } else if (checkData.length === 0) {
+          console.log('Album successfully deleted from favorites.');
+        } else {
+          console.error('Album was not deleted from favorites.');
+        }
+      }
+
       setShowDeleteModal(false);
       setDeleteItemId(null);
     }
@@ -63,11 +90,17 @@ export const FavoritesPage = () => {
 
   const handleConfirmDeleteAll = async () => {
     try {
-      await supabase
+      const { error } = await supabase
         .from('favorites')
         .delete()
         .eq('user_id', user.id);
-      setFavorites([]);
+
+      if (error) {
+        console.error('Error deleting all favorites:', error);
+      } else {
+        setFavorites([]);
+      }
+
       setShowDeleteModal(false);
       setDeleteItemId(null);
     } catch (error) {
