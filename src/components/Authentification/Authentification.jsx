@@ -48,6 +48,7 @@ export const Authentification = ({ onClose }) => {
 
   return (
     <div className={s.modal}>
+      <div className={s.modal__backgroundText}>Audio.com</div>
       <div className={s.modal__content}>
         <button className={s.modal__close} onClick={onClose}>&times;</button>
         <div className={s.modal__title}>{isRegister ? 'Sign Up' : 'Log In'}</div>
