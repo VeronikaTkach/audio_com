@@ -68,8 +68,10 @@ export const CatalogPage = () => {
     };
   }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats, hasMoreAlbums]);
 
+
   const handleSearch = (term) => {
     dispatch(setSearchTerm(term));
+    debouncedFetchAlbums(term, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value)); // С задержкой обновляем список альбомов
   };
 
   const handleGenreChange = (selectedOption) => {
