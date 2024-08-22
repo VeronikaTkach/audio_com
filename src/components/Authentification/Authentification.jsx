@@ -55,18 +55,20 @@ export const Authentification = ({ onClose }) => {
         <form className={s.modal__form} onSubmit={handleSubmit}>
           <label className={s.modal__label}>
             Email:
-            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input style={{maxWidth:'200px'}} type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </label>
           <label className={s.modal__label}>
             Password:
-            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <input style={{maxWidth:'200px'}}  type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </label>
           <Button
+            style={{maxWidth:'320px'}}
             type="submit"
             disabled={authStatus === 'loading'}
             label={isRegister ? 'Register' : 'Submit'}
           />
           <Button
+            style={{maxWidth:'320px'}}
             type="submit"
             onClick={() => setIsRegister(!isRegister)}
             label={isRegister ? 'Switch to Log In' : 'Switch to Sign Up'}

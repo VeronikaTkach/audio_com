@@ -25,7 +25,7 @@
     grid-template-rows: repeat(2, auto);
     gap: 20px;
     width: 100%;
-    @media (max-width: 950px) {
+    @media (max-width: 1030px) {
       grid-template-columns: 1fr;
       grid-template-rows: auto;
       column-gap: 0;
