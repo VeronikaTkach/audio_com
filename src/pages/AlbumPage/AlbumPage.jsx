@@ -1,6 +1,7 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { getUser } from '../../core/store/userSlice';
 import { supabase } from '../../../supabaseClient';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
@@ -117,7 +118,7 @@ export const AlbumPage = () => {
         setLoadingState('deleted');
 
         setTimeout(() => {
-            alert('Album has been successfully deleted!');
+            toast.success('Album has been successfully deleted!');
             navigate('/catalog');
         }, 100);
 
@@ -162,7 +163,7 @@ export const AlbumPage = () => {
         console.error('Error adding to favorites:', error);
       } else {
         setIsFavorite(true);
-        alert('Added to favorites!');
+        toast.success('Added to favorites!');
       }
     }
   };

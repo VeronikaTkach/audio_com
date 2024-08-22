@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../../ui/Button';
 import { ConfirmDeleteModal } from '../../ui/ConfirmDeleteModal';
 import { supabase } from '../../../../supabaseClient';
+import { toast } from 'react-toastify';
 
 export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className }) => {
   const [isDeleting, setIsDeleting] = useState(false);
@@ -13,7 +14,7 @@ export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className 
   };
 
   const handleConfirmDelete = async () => {
-    setShowConfirmDelete(false); // Скрываем модальное окно до выполнения операции
+    setShowConfirmDelete(false);
     setIsDeleting(true);
 
     try {
@@ -38,12 +39,10 @@ export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className 
 
       if (albumError) {
         console.error('Error deleting album:', albumError);
-        alert(`Failed to delete album: ${albumError.message}`);
+        toast.error(`Failed to delete album: ${albumError.message}`);
       } else {
-        // Принудительно скрываем модальное окно после закрытия алерта
         setShowConfirmDelete(false);
 
-        // Обновляем список альбомов после успешного удаления
         if (refreshAlbums) {
           refreshAlbums();
         }
@@ -52,14 +51,13 @@ export const DeleteAlbumButton = ({ albumId, onDelete, refreshAlbums, className 
           onDelete(albumId);
         }
 
-        // Показать алерт и обновить страницу после его закрытия
-        alert('Album deleted successfully!');
+        toast.success('Album deleted successfully!');
       }
     } catch (error) {
       console.error('Error deleting album:', error);
       setIsDeleting(false);
-      setShowConfirmDelete(false); // Принудительно скрываем модальное окно в случае ошибки
-      alert(`Failed to delete album: ${error.message}`);
+      setShowConfirmDelete(false);
+      toast.error(`Failed to delete album: ${error.message}`);
     }
   };
 

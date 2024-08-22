@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { supabase } from '../../../supabaseClient';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';
@@ -77,7 +78,7 @@ export const AddNewAlbumPage = () => {
             .eq('genre', trimmedGenre)
             .single();
 
-        if (error && error.code !== 'PGRST116') { // Если ошибка не связана с отсутствием записи
+        if (error && error.code !== 'PGRST116') {
             console.error('Error checking genre:', error.message);
             throw error;
         }
@@ -188,7 +189,6 @@ export const AddNewAlbumPage = () => {
 
       imageUrl = publicUrlResponse.publicUrl;
     } else {
-      // Используем изображение по умолчанию
       imageUrl = defaultCover;
     }
 
@@ -202,7 +202,6 @@ export const AddNewAlbumPage = () => {
         image: imageUrl || defaultCover
       };
 
-      // Вставляем альбом в таблицу albums
       const { data: createdAlbum, error: albumError } = await supabase
         .from('albums')
         .insert(newAlbum)
@@ -228,7 +227,7 @@ export const AddNewAlbumPage = () => {
           .insert({ album_id: createdAlbum.id, format_id: formatId });
       }
 
-      alert('New Album Created');
+      toast.success('New Album Created!');
       dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
         navigate('/catalog');
       });

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { debounce } from 'lodash';
+import { toast } from 'react-toastify';
 import { fetchAlbums, setSearchTerm, setCurrentPage, deleteAlbum, resetAlbums } from '../../core/store/albumsSlice';
 import { supabase } from '../../../supabaseClient';
 import { SearchInput } from '../../components/ui/SearchInput';
@@ -151,8 +152,11 @@ export const CatalogPage = () => {
         setShowConfirmDelete(false);
         setSelectedAlbumId(null);
 
+        toast.success('Album deleted successfully!');
+
     } catch (error) {
         console.error('Error deleting album:', error.message);
+        toast.error('Failed to delete album.');
     }
   };
 

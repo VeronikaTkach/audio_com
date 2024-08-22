@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 import { Button } from '../../ui/Button';
 import s from '../../../pages/AlbumPage/styles.module.scss';
 import { FaRegStar, FaStar } from 'react-icons/fa';
@@ -6,7 +7,7 @@ import { FaRegStar, FaStar } from 'react-icons/fa';
 const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onAddToFavorites }) => {
   const handleAddToFavoritesClick = () => {
     if (isFavorite) {
-      alert('Album is already added in Favorites.');
+      toast.success('Album is already added in Favorites!');
       return;
     }
     onAddToFavorites();

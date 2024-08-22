@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { fetchUser, registerUser } from "../../core/store/userSlice";
 import { Button } from "../ui/Button/Button";
 import s from './styles.module.scss';
@@ -26,14 +27,12 @@ export const Authentification = ({ onClose }) => {
       if (isRegister) {
         const user = await dispatch(registerUser({ email, password })).unwrap();
         if (user) {
-          console.log('Регистрация успешна');
-          alert('Registration successful!');
+          toast.success('Registration successful!');
           navigate(from, { replace: true });
         }
       } else {
         const user = await dispatch(fetchUser({ email, password })).unwrap();
         if (user) {
-          console.log('Вы вошли в профиль');
           navigate(from, { replace: true });
         }
       }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { supabase } from '../../../supabaseClient';
 import { Button } from '../../components/ui/Button';
 import { FaRegStar, FaStar } from 'react-icons/fa';
@@ -32,7 +33,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
     if (user) {
 
       if (isFavorite) {
-        alert('Album is already added in Favorites.');
+        toast.success('Album is already added in Favorites!');
         return;
       }
 
@@ -61,7 +62,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         console.error('Error adding to favorites:', error);
       } else {
         setIsFavorite(true);
-        alert('Added to favorites!');
+        toast.success('Added to favorites!');
       }
     }
   };
