@@ -52,10 +52,11 @@
 .filters {
   &__popup {
     position: fixed;
-    top: 15%;
+    top: 18%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--background-color);
+    border-radius: 15px;
     padding: 20px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
@@ -64,10 +65,6 @@
       max-width: 600px;
       top: 30%;
     }
-
-    // @media (max-width: 460px) {
-    //   min-width: 330px;
-    // }
 
     &__header {
       display: flex;
