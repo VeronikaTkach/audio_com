@@ -16,8 +16,8 @@ const AlbumDetails = ({ album, user, isFavorite, onEditClick, onDeleteClick, onA
   return (
     <div className={s.album__details}>
       <div className={s.album__fav}>
-        <h1>{album.title}</h1>
-        {user && (
+      <h1 className={s.album__title}>{album.title}</h1>
+      {user && (
         <div className={s.album__fav_icon} onClick={handleAddToFavoritesClick}>
           {isFavorite ? <FaStar size={36} color="gold" /> : <FaRegStar size={36} color="gold" />}
         </div>

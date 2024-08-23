@@ -4,18 +4,51 @@
     padding: 80px;
     display: flex;
     justify-content: flex-start;
+
+    @media (max-width: 1230px) {
+      max-width: 1200px;
+    }
+
+    @media (max-width: 1020px) {
+      max-width: 800px;
+      padding: 40px;
+    }
+
+    @media (max-width: 771px) {
+      flex-direction: column;
+      align-items: center;
+    }
   }
   
   &__content {
     display: flex;
     gap: 10vw;
     align-items: center;
+
+    @media (max-width: 771px) {
+      flex-direction: column;
+      gap: 20px;
+    }
   }
   
   &__image {
-    width: 600px;
-    height: 600px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 600px;
+    min-width: 150px;
+    min-height: 150px;
     object-fit: cover;
+    transition: width 0.3s ease, height 0.3s ease;
+
+    @media (max-width: 771px) {
+      width: 80%;
+      max-width: 400px;
+    }
+
+    @media (max-width: 460px) {
+      width: 100%;
+      max-width: 300px;
+    }
   }
   
   &__details {
@@ -24,49 +57,70 @@
     gap: 20px;
     align-items: flex-start;
     width: 100%;
+
+    @media (max-width: 771px) {
+      align-items: center;
+    }
   }
 
   &__fav {
     display: flex;
     align-items: center;
     gap: 36px;
+
+    &_icon {
+      cursor: pointer;
+      margin-left: 10px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  &__title {
+    font-size: 2.5rem;
+    transition: font-size 0.3s ease;
+
+    @media (max-width: 1024px) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 1.8rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.5rem;
+    }
   }
 
   &__table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
-  }
-  
-  &__table_row {
-    border-bottom: 1px solid #ccc;
-  }
-  
-  &__table_cell {
-    padding: 10px;
-    vertical-align: top;
 
-    &:first-child {
-      font-weight: bold;
-      width: 30%;
+    &_row {
+      border-bottom: 1px solid #ccc;
     }
-  }
-  
-  &__table_header {
-    padding: 10px;
-    text-align: left;
-    background-color: #f4f4f4;
+    
+    &_cell {
+      padding: 10px;
+      vertical-align: top;
+    
+      &:first-child {
+        font-weight: bold;
+        width: 30%;
+      }
+    }
+    
+    &_header {
+      padding: 10px;
+      text-align: left;
+      background-color: #f4f4f4;
+    }
   }
 
   &__actions {
     display: flex;
     gap: 20px;
-  }
-
-  &__fav_icon {
-    cursor: pointer;
-    margin-left: 10px;
-    display: inline-flex;
-    align-items: center;
   }
 }

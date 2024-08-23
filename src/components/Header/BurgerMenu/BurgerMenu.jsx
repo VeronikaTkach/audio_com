@@ -53,7 +53,7 @@ const SidePanel = styled.div`
     color: #f1f1f1;
   }
 
-  @media (min-width: 771px) {
+  @media (min-width: 1021px) {
     display: none;
   }
 `;
