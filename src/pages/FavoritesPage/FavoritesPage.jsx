@@ -11,6 +11,7 @@ export const FavoritesPage = () => {
   const [favorites, setFavorites] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 771);
   const user = useSelector((state) => state.user.user);
   const navigate = useNavigate();
   
@@ -38,6 +39,15 @@ export const FavoritesPage = () => {
     };
     fetchFavorites();
   }, [user]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 771);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleDeleteClick = (id) => {
     setDeleteItemId(id);
@@ -129,7 +139,7 @@ export const FavoritesPage = () => {
                 onClick={() => handleAlbumPageClick(fav.album_id)}
               />
               <Button 
-                label={'Remove from Favorites'} 
+                label={isMobile ? 'x' : 'Remove from Favorites'} 
                 onClick={() => handleDeleteClick(fav.id)} 
                 className={s.remove__button}
               />

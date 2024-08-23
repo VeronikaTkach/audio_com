@@ -84,10 +84,9 @@ export const AddNewAlbumPage = () => {
         }
 
         if (data) {
-            // Жанр уже существует, добавляем его ID в список
             genreIds.push(data.genre_id);
+
         } else {
-            // Жанра нет, добавляем его
             const { data: newGenre, error: genreError } = await supabase
                 .from('genre')
                 .insert({ genre: trimmedGenre })
@@ -99,7 +98,6 @@ export const AddNewAlbumPage = () => {
                 throw genreError;
             }
 
-            // Добавляем ID нового жанра в список
             genreIds.push(newGenre.genre_id);
         }
     }
@@ -126,10 +124,8 @@ export const AddNewAlbumPage = () => {
       }
 
       if (data) {
-        // Формат уже существует, добавляем его ID в список
         formatIds.push(data.format_id);
       } else {
-        // Формата нет, добавляем его
         const { data: newFormat, error: formatError } = await supabase
           .from('format')
           .insert({ format: trimmedFormat })
@@ -141,7 +137,6 @@ export const AddNewAlbumPage = () => {
           throw formatError;
         }
 
-        // Добавляем ID нового формата в список
         formatIds.push(newFormat.format_id);
       }
     }
@@ -193,7 +188,6 @@ export const AddNewAlbumPage = () => {
     }
 
     try {
-      // Сначала сохраняем жанры и получаем их IDs
       const genreIds = await saveGenres(album.genre);
       const formatIds = await saveFormats(album.format);
 
