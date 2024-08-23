@@ -4,6 +4,7 @@
     align-items: center;
     justify-content: space-between;
     border: 1px solid #ccc;
+    border-radius: 15px;
     padding: 15px;
     gap: 20px;
     cursor: pointer;
@@ -25,6 +26,7 @@
   &__image {
     width: 150px;
     height: 150px;
+    border-radius: 15px;
 
     @media (max-width: 600px) {
       margin-bottom: 10px;

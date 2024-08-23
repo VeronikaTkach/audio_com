@@ -29,6 +29,7 @@
   --button-text: #fffcf2;
   --input-color: white;
   --checkbox-color-checked: #252f3f;
+  --toggle-background: #e9764b;
 }
 
 .App.dark {
@@ -40,6 +41,7 @@
   --button-text: #252f3f;
   --input-color: #fffcf2;
   --checkbox-color-checked: #e9764b;
+  --toggle-background: #252f3f;
 }
 
 .routes {

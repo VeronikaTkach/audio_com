@@ -16,23 +16,24 @@ const BurgerIcon = styled.div`
   & div {
     width: 30px;
     height: 3px;
-    background-color: #333;
+    background-color: var(--text-color);
     margin: 5px 0;
     transition: 0.4s;
   }
 `;
 
 const SidePanel = styled.div`
-  height: 100%;
+  height: 40%;
   width: ${(props) => (props.open ? '250px' : '0')};
   position: fixed;
   top: 0;
   right: 0;
-  background-color: #333;
+  background-color: var(--text-color);
   color: white;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
+  border-bottom-left-radius: 15px;
   z-index: 1000;
 
   a, button {
@@ -42,7 +43,7 @@ const SidePanel = styled.div`
     color: #818181;
     display: block;
     transition: 0.3s;
-    text-align: left; /* Выровнять по левому краю */
+    text-align: left;
     background: none;
     border: none;
     cursor: pointer;
@@ -60,9 +61,9 @@ const SidePanel = styled.div`
 const CloseButton = styled.a`
   position: absolute;
   top: 0;
-  right: 25px;
+  right: 10px;
   font-size: 36px;
-  margin-left: 50px;
+  // margin-left: 30px;
   cursor: pointer;
 `;
 
