@@ -46,6 +46,14 @@ export const CatalogPage = () => {
   );
 
   useEffect(() => {
+    // Сброс состояния альбомов и установка текущей страницы в 1
+    dispatch(resetAlbums());
+    dispatch(setCurrentPage(1));
+    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
+  }, [dispatch, debouncedFetchAlbums, searchTerm, selectedGenre, selectedYear, selectedFormats]);
+
+
+  useEffect(() => {
     debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
   }, [searchTerm, selectedGenre, selectedYear, selectedFormats, debouncedFetchAlbums]);
 
