@@ -20,7 +20,6 @@ export const CatalogPage = () => {
   const user = useSelector(state => state.user.user);
   const [showFiltersPopup, setShowFiltersPopup] = useState(false);
 
-  const debouncedFetchAlbums = useFetchAlbums(searchTerm, selectedGenre, selectedYear, selectedFormats);
   const {
     selectedGenre,
     selectedYear,
@@ -29,7 +28,9 @@ export const CatalogPage = () => {
     handleYearChange,
     handleFormatChange,
     resetAllFilters,
-  } = useFilters(debouncedFetchAlbums, searchTerm);
+  } = useFilters();
+
+  const debouncedFetchAlbums = useFetchAlbums(searchTerm, selectedGenre, selectedYear, selectedFormats);
 
   const {
     selectedAlbumId,

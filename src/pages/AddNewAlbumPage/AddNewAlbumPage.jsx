@@ -1,5 +1,3 @@
-// src/components/AddNewAlbumPage.jsx
-
 import React from 'react';
 import { AlbumGrid } from '../../components/AlbumGrid';
 import { Button } from '../../components/ui/Button/Button';

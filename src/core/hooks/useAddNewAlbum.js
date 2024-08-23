@@ -1,11 +1,10 @@
-// src/hooks/useAddNewAlbum.js
-
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { supabase } from '../../../supabaseClient';
-import { fetchGenres, fetchAlbums } from '../../core/store/store';
+import { fetchAlbums } from '../../core/store/albumsSlice';
+import { fetchGenres} from '../../core/store/genresSlice';
 
 export const useAddNewAlbum = () => {
   const [album, setAlbum] = useState({

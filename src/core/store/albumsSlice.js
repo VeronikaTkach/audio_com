@@ -12,13 +12,11 @@ export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page,
     .select('*')
     .range(start, end);
 
-  // Apply search term filter if provided
   if (searchTerm) {
     console.log('Applying search term filter:', searchTerm);
     query = query.or(`title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`);
   }
 
-  // Apply genre filter if provided
   if (genre) {
     console.log('Applying genre filter:', genre);
     const { data: genreData, error: genreError } = await supabase
@@ -29,7 +27,7 @@ export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page,
 
     if (genreError || !genreData) {
       console.error('Error fetching genre:', genreError ? genreError.message : 'No genre found');
-      return []; // return an empty array if genre filter fails
+      return [];
     }
 
     const genreId = genreData.genre_id;
@@ -51,7 +49,6 @@ export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page,
     query = query.in('id', albumIds);
   }
 
-  // Apply year filter if provided
   if (year) {
     console.log('Applying year filter:', year);
     const startDate = `${year}-01-01`;
@@ -59,17 +56,16 @@ export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page,
     query = query.gte('release_date', startDate).lte('release_date', endDate);
   }
 
-  // Apply format filter if provided
   if (formats && formats.length > 0) {
     console.log('Applying format filter:', formats);
     const { data: formatData, error: formatError } = await supabase
       .from('format')
       .select('format_id')
-      .in('format', formats); // Используем `in` для массива форматов
+      .in('format', formats); 
 
     if (formatError || !formatData || formatData.length === 0) {
       console.error('Error fetching format:', formatError ? formatError.message : 'No format found');
-      return []; // return an empty array if format filter fails
+      return [];
     }
 
     const formatIds = formatData.map(f => f.format_id);
@@ -77,7 +73,7 @@ export const fetchAlbums = createAsyncThunk('albums/fetchAlbums', async ({ page,
     const { data: formatAlbums, error: formatAlbumsError } = await supabase
       .from('format_album')
       .select('album_id')
-      .in('format_id', formatIds); // Используем `in` для фильтрации по нескольким format_id
+      .in('format_id', formatIds);
 
     if (formatAlbumsError || formatAlbums.length === 0) {
       console.error('Error fetching format_album or no albums found:', formatAlbumsError ? formatAlbumsError.message : 'No albums found for the selected formats.');
