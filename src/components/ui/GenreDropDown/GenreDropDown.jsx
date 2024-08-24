@@ -65,7 +65,7 @@ const customStyles = {
   }),
 };
 
-export const GenreDropdown = ({ selectedGenres, handleGenreChange }) => {
+export const GenreDropdown = ({ selectedGenres, handleGenreChange, options }) => {
   const dispatch = useDispatch();
   const genres = useSelector(state => state.genres.genres);
 
@@ -79,7 +79,7 @@ export const GenreDropdown = ({ selectedGenres, handleGenreChange }) => {
       <CreatableSelect
         isMulti
         name="genres"
-        options={genres}
+        options={options}
         className={s.dropdown}
         classNamePrefix="select"
         onChange={handleGenreChange}
@@ -94,5 +94,6 @@ export const GenreDropdown = ({ selectedGenres, handleGenreChange }) => {
 
 GenreDropdown.propTypes = {
   selectedGenres: PropTypes.array.isRequired,
-  handleGenreChange: PropTypes.func.isRequired
+  handleGenreChange: PropTypes.func.isRequired,
+  options: PropTypes.array.isRequired,
 };

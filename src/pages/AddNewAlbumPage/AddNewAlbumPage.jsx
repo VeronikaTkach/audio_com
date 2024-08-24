@@ -7,6 +7,7 @@ import s from './styles.module.scss';
 export const AddNewAlbumPage = () => {
   const {
     album,
+    genres,
     error,
     imageFile,
     fileName,
@@ -21,6 +22,7 @@ export const AddNewAlbumPage = () => {
       <h1>New Album</h1>
       <AlbumGrid
         album={album}
+        genres={genres}
         handleInputChange={handleInputChange}
         handleImageChange={handleImageChange}
         imageFile={imageFile}

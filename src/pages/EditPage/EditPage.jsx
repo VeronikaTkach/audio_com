@@ -8,6 +8,7 @@ import s from './styles.module.scss';
 export const EditPage = () => {
   const {
     album,
+    genres,
     error,
     imageFile,
     fileName,
@@ -27,6 +28,7 @@ export const EditPage = () => {
       <h1>Edit Album</h1>
       <AlbumGrid
         album={album}
+        genres={genres}
         handleInputChange={handleInputChange}
         handleImageChange={handleImageChange}
         imageFile={imageFile}

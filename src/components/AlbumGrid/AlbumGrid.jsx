@@ -8,6 +8,7 @@ import s from './styles.module.scss';
 
 export const AlbumGrid = ({
   album,
+  genres,
   handleInputChange,
   handleImageChange = null,
   imageFile = null,
@@ -19,13 +20,15 @@ export const AlbumGrid = ({
   useEffect(() => {
     if (album.genre) {
       const genresArray = Array.isArray(album.genre) ? album.genre : JSON.parse(album.genre);
-      setSelectedGenres(genresArray.map(g => ({ value: g, label: g })));
+      setSelectedGenres(genresArray.map((g) => ({ value: g, label: g })));
     }
   }, [album.genre]);
 
   const handleGenreChange = (selectedOptions) => {
     setSelectedGenres(selectedOptions);
-    handleInputChange({ target: { name: 'genre', value: selectedOptions.map(option => option.value) } });
+    handleInputChange({
+      target: { name: 'genre', value: selectedOptions.map((option) => option.value) },
+    });
   };
 
   return (
@@ -100,7 +103,7 @@ export const AlbumGrid = ({
       </div>
       <div className={s.form__group}>
         <label>Genre</label>
-        <GenreDropdown selectedGenres={selectedGenres} handleGenreChange={handleGenreChange} />
+        <GenreDropdown selectedGenres={selectedGenres} handleGenreChange={handleGenreChange} options={genres}/>
       </div>
       <div className={s.form__group}>
         <label style={{ textAlign: 'start' }}>Image URL</label>
@@ -151,9 +154,10 @@ export const AlbumGrid = ({
 
 AlbumGrid.propTypes = {
   album: PropTypes.object.isRequired,
+  genres: PropTypes.array.isRequired,
   handleInputChange: PropTypes.func.isRequired,
   handleImageChange: PropTypes.func,
   imageFile: PropTypes.object,
   fileName: PropTypes.string,
-  isEdit: PropTypes.bool
+  isEdit: PropTypes.bool,
 };
