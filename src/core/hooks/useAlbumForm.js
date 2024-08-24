@@ -30,8 +30,7 @@ export const useAlbumForm = (initialAlbum = null, mode = 'add') => {
     const fetchGenres = async () => {
       try {
         const fetchedGenres = await fetchGenresFromSupabase();
-        console.log('Fetched genres:', fetchedGenres); // Добавьте логирование для отладки
-        setGenres(fetchedGenres.map((genre) => ({ value: genre.genre, label: genre.genre }))); // Преобразуем жанры для использования в дропдауне
+        setGenres(fetchedGenres.map((genre) => ({ value: genre.genre, label: genre.genre })));
       } catch (err) {
         setError('Error fetching genres: ' + err.message);
       }
@@ -47,16 +46,16 @@ export const useAlbumForm = (initialAlbum = null, mode = 'add') => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+  
     if (name === 'format') {
       const formats = album.format.includes(value)
         ? album.format.filter((f) => f !== value)
         : [...album.format, value];
       setAlbum({ ...album, format: formats });
     } else if (name === 'genre') {
-      const genres = album.genre.includes(value)
-        ? album.genre.filter((g) => g !== value)
-        : [...album.genre, value];
-      setAlbum({ ...album, genre: genres });
+      const genres = Array.isArray(value) ? value : [value];
+      const filteredGenres = genres.filter((g) => g && g.trim() !== '');
+      setAlbum({ ...album, genre: filteredGenres });
     } else {
       setAlbum({ ...album, [name]: value });
     }
@@ -73,16 +72,18 @@ export const useAlbumForm = (initialAlbum = null, mode = 'add') => {
     try {
       const genreIds = await saveGenresToSupabase(album.genre);
       const formatIds = await saveFormatsToSupabase(album.format);
-
+  
       if (imageFile) {
         album.image = await uploadImageToSupabase(album.artist, album.title, imageFile);
       }
 
       await customSaveCallback(album, genreIds, formatIds);
-
+      const updatedGenres = await fetchGenresFromSupabase();
+      setGenres(updatedGenres.map((genre) => ({ value: genre.genre, label: genre.genre })));
       toast.success('Album saved successfully!');
     } catch (err) {
       setError('Error saving album: ' + err.message);
+      console.error(err);
     }
   };
 

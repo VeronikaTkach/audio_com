@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../../supabaseClient';
 
+// Асинхронный thunk для получения жанров из таблицы 'albums' в Supabase
 export const fetchGenres = createAsyncThunk('genres/fetchGenres', async () => {
   const { data, error } = await supabase
     .from('albums')
@@ -15,7 +16,6 @@ export const fetchGenres = createAsyncThunk('genres/fetchGenres', async () => {
   try {
     data.forEach(album => {
       if (album.genre) {
-        // Проверка формата данных перед JSON.parse
         if (typeof album.genre === 'string' && album.genre.trim().startsWith('[')) {
           JSON.parse(album.genre).forEach(genre => genres.add(genre));
         } else {
@@ -31,6 +31,26 @@ export const fetchGenres = createAsyncThunk('genres/fetchGenres', async () => {
   return Array.from(genres).map(genre => ({ value: genre, label: genre }));
 });
 
+// Асинхронный thunk для добавления нового жанра в таблицу 'genre' в Supabase
+export const saveGenreToSupabase = createAsyncThunk('genres/saveGenre', async (newGenre, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase
+      .from('genre')
+      .insert([{ genre: newGenre.value }]);
+
+    if (error) {
+      console.error('Error adding genre to Supabase:', error.message);
+      return rejectWithValue(error.message);
+    }
+
+    console.log('New genre added to Supabase:', data);
+    return newGenre;
+  } catch (err) {
+    console.error('Error saving genre:', err.message);
+    return rejectWithValue(err.message);
+  }
+});
+
 const genresSlice = createSlice({
   name: 'genres',
   initialState: {
@@ -40,8 +60,9 @@ const genresSlice = createSlice({
   },
   reducers: {
     addGenre: (state, action) => {
+      console.log('Adding genre to state:', action.payload);
       state.genres.push(action.payload);
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -56,6 +77,19 @@ const genresSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
         console.error('Error in genresSlice:', action.error.message);
+      })
+      .addCase(saveGenreToSupabase.pending, (state) => {
+        state.status = 'saving';
+      })
+      .addCase(saveGenreToSupabase.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.genres.push(action.payload);
+        console.log('Genre successfully saved and added to state:', action.payload);
+      })
+      .addCase(saveGenreToSupabase.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+        console.error('Error saving genre to Supabase:', action.payload);
       });
   }
 });

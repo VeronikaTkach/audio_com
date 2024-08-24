@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { supabase } from '../../../supabaseClient';
 import { Button } from '../../components/ui/Button';
 import { FaRegStar, FaStar } from 'react-icons/fa';
 import s from './styles.module.scss';
+import defaultCover from '../../assets/photo.png';
+
+const AlbumImage = lazy(() => import('../../components/ui/AlbumImage/AlbumImage'));
 
 export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
   const user = useSelector(state => state.user.user);
@@ -31,9 +34,8 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
 
   const handleAddToFavorites = async () => {
     if (user) {
-
       if (isFavorite) {
-        toast.success('Album is already added in Favorites!');
+        toast.success('Альбом уже добавлен в избранное!');
         return;
       }
 
@@ -44,7 +46,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         .single();
 
       if (albumError) {
-        console.error('Error fetching album details:', albumError);
+        console.error('Ошибка при получении информации об альбоме:', albumError);
         return;
       }
 
@@ -59,10 +61,10 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         }]);
 
       if (error) {
-        console.error('Error adding to favorites:', error);
+        console.error('Ошибка при добавлении в избранное:', error);
       } else {
         setIsFavorite(true);
-        toast.success('Added to favorites!');
+        toast.success('Добавлено в избранное!');
       }
     }
   };
@@ -70,7 +72,9 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
   return (
     <div className={s.album__item} onClick={() => onClick(album.id)}>
       <div className={s.album__info}>
-        <img src={album.image} alt={`${album.title} cover`} className={s.album__image} />
+        <Suspense fallback={<img src={defaultCover} alt="Обложка по умолчанию" className={s.album__image} />}>
+          <AlbumImage src={album.image} alt={`${album.title} cover`} />
+        </Suspense>
       </div>
       <div className={s.album__details}>
         <div className={s.album__artist}>{album.artist}</div>
@@ -88,12 +92,12 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         {isEditor && (
           <div className={s.album__actions}>
             <Button 
-              label="Edit" 
+              label="Редактировать" 
               onClick={(e) => { e.stopPropagation(); onEdit(album.id); }} 
               className={s.album__button} 
             />
             <Button 
-              label="Delete" 
+              label="Удалить" 
               onClick={(e) => { e.stopPropagation(); onDelete(album.id); }} 
               className={s.album__button} 
             />

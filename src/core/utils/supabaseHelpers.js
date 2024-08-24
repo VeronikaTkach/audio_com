@@ -1,13 +1,13 @@
 import { supabase } from '../../../supabaseClient';
 
-// Helper to fetch genres
+// Получение жанров
 export const fetchGenresFromSupabase = async () => {
   let { data, error } = await supabase.from('genre').select('*');
   if (error) throw new Error('Error fetching genres: ' + error.message);
   return data;
 };
 
-// Helper to check if an album exists
+// Существование альбома
 export const checkIfSuchAlbumExists = async (title, artist) => {
   let { data, error } = await supabase
     .from('albums')
@@ -19,37 +19,49 @@ export const checkIfSuchAlbumExists = async (title, artist) => {
   return data.length > 0;
 };
 
-// Helper to save genres
+// Сохранение жанров
 export const saveGenresToSupabase = async (genres) => {
   const genreIds = [];
   for (const genre of genres) {
     const trimmedGenre = genre.trim();
+
     let { data, error } = await supabase
       .from('genre')
       .select('genre_id')
       .eq('genre', trimmedGenre)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw new Error('Error checking genre: ' + error.message);
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking genre:', error.message);
+      throw new Error('Error checking genre: ' + error.message);
+    }
 
     if (data) {
+      console.log('Genre already exists:', data);
       genreIds.push(data.genre_id);
     } else {
+      console.log('Inserting new genre:', trimmedGenre);
+
       const { data: newGenre, error: genreError } = await supabase
         .from('genre')
         .insert({ genre: trimmedGenre })
         .select()
         .single();
 
-      if (genreError) throw new Error('Error adding genre: ' + genreError.message);
+      if (genreError) {
+        console.error('Error adding genre:', genreError.message);
+        throw new Error('Error adding genre: ' + genreError.message);
+      }
 
+      console.log('New genre added:', newGenre);
       genreIds.push(newGenre.genre_id);
     }
   }
   return genreIds;
 };
 
-// Helper to save formats
+
+// Сохранение формата
 export const saveFormatsToSupabase = async (formats) => {
   const formatIds = [];
   for (const format of formats) {
@@ -79,7 +91,7 @@ export const saveFormatsToSupabase = async (formats) => {
   return formatIds;
 };
 
-// Helper to upload images
+// Загрузка изображения
 export const uploadImageToSupabase = async (artist, title, imageFile) => {
   const coverPath = `covers/${artist}/${title}`;
   const { error: uploadError } = await supabase.storage

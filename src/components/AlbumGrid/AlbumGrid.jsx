@@ -16,19 +16,27 @@ export const AlbumGrid = ({
   isEdit = false,
 }) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [options, setOptions] = useState(genres);
 
   useEffect(() => {
+    setOptions(genres);
+
     if (album.genre) {
       const genresArray = Array.isArray(album.genre) ? album.genre : JSON.parse(album.genre);
-      setSelectedGenres(genresArray.map((g) => ({ value: g, label: g })));
+      const newSelectedGenres = genresArray.map((g) => ({ value: g, label: g }));
+      
+      if (JSON.stringify(newSelectedGenres) !== JSON.stringify(selectedGenres)) {
+        setSelectedGenres(newSelectedGenres);
+      }
     }
-  }, [album.genre]);
+  }, [album.genre, genres]);
 
   const handleGenreChange = (selectedOptions) => {
     setSelectedGenres(selectedOptions);
     handleInputChange({
       target: { name: 'genre', value: selectedOptions.map((option) => option.value) },
     });
+
   };
 
   return (
@@ -103,7 +111,12 @@ export const AlbumGrid = ({
       </div>
       <div className={s.form__group}>
         <label>Genre</label>
-        <GenreDropdown selectedGenres={selectedGenres} handleGenreChange={handleGenreChange} options={genres}/>
+        <GenreDropdown 
+          selectedGenres={selectedGenres} 
+          handleGenreChange={handleGenreChange} 
+          options={options} 
+          setOptions={setOptions}
+        />
       </div>
       <div className={s.form__group}>
         <label style={{ textAlign: 'start' }}>Image URL</label>

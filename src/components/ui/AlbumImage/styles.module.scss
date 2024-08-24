@@ -1,0 +1,9 @@
+.album__image {
+  width: 150px;
+  height: 150px;
+  border-radius: 15px;
+
+  @media (max-width: 630px) {
+    margin-bottom: 10px;
+  }
+}

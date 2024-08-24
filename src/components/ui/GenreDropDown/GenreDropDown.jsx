@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import CreatableSelect from 'react-select/creatable';
-import { addGenre } from '../../../core/store/genresSlice';
+import { saveGenreToSupabase } from '../../../core/store/genresSlice';
 import s from './styles.module.scss';
 
 const customStyles = {
@@ -65,13 +65,34 @@ const customStyles = {
   }),
 };
 
-export const GenreDropdown = ({ selectedGenres, handleGenreChange, options }) => {
+export const GenreDropdown = ({ selectedGenres, handleGenreChange, options, setOptions }) => {
   const dispatch = useDispatch();
-  const genres = useSelector(state => state.genres.genres);
 
-  const handleCreate = (inputValue) => {
+  const handleCreate = async (inputValue) => {
     const newOption = { value: inputValue.toLowerCase(), label: inputValue };
-    dispatch(addGenre(newOption));
+
+    try {
+      const result = await dispatch(saveGenreToSupabase(newOption)).unwrap();
+
+      setOptions((prevOptions) => {
+        const updatedOptions = [...prevOptions, newOption];
+        return updatedOptions;
+      });
+
+    } catch (error) {
+      console.error('Ошибка при добавлении нового жанра:', error);
+    }
+  };
+
+  const handleGenreChangeInternal = (selectedOptions) => {
+  
+    if (!selectedOptions || selectedOptions.length === 0) {
+      handleGenreChange([]);
+      return;
+    }
+
+    const filteredOptions = selectedOptions.filter(option => option && typeof option.value === 'string');
+    handleGenreChange(filteredOptions);
   };
 
   return (
@@ -82,11 +103,12 @@ export const GenreDropdown = ({ selectedGenres, handleGenreChange, options }) =>
         options={options}
         className={s.dropdown}
         classNamePrefix="select"
-        onChange={handleGenreChange}
+        onChange={handleGenreChangeInternal}
         onCreateOption={handleCreate}
         value={selectedGenres}
         placeholder="Select genres..."
         styles={customStyles}
+        isClearable
       />
     </div>
   );
@@ -96,4 +118,5 @@ GenreDropdown.propTypes = {
   selectedGenres: PropTypes.array.isRequired,
   handleGenreChange: PropTypes.func.isRequired,
   options: PropTypes.array.isRequired,
+  setOptions: PropTypes.func.isRequired,
 };
