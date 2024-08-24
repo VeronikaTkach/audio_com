@@ -1,59 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '../../../supabaseClient';
+import { fetchUserApi, registerUserApi, getUserApi, logoutUserApi } from '../../api';
 
-export const fetchUser = createAsyncThunk('user/fetchUser', async ({ email, password }) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw error;
+// Асинхронный thunk для получения пользователя
+export const fetchUser = createAsyncThunk('user/fetchUser', fetchUserApi);
 
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .select('isEditor')
-    .eq('id', data.user.id)
-    .single();
+// Асинхронный thunk для регистрации пользователя
+export const registerUser = createAsyncThunk('user/registerUser', registerUserApi);
 
-  if (userError) throw userError;
+// Асинхронный thunk для получения текущего пользователя
+export const getUser = createAsyncThunk('user/getUser', getUserApi);
 
-  return { ...data.user, isEditor: userData.isEditor };
-});
-
-export const registerUser = createAsyncThunk('user/registerUser', async ({ email, password }) => {
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) {
-    console.error('Ошибка при регистрации пользователя:', error);
-    throw error;
-  }
-  console.log('Пользователь успешно зарегистрирован:', data.user);
-
-  const { error: userError } = await supabase
-    .from('users')
-    .insert([{ id: data.user.id, email: data.user.email, isEditor: false }]);
-
-  if (userError) {
-    console.error('Ошибка при вставке дополнительных данных:', userError);
-    throw userError;
-  }
-
-  return { ...data.user, isEditor: false };
-});
-
-export const getUser = createAsyncThunk('user/getUser', async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) throw error;
-  
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .select('isEditor')
-    .eq('id', user.id)
-    .single();
-
-  if (userError) throw userError;
-  return { ...user, isEditor: userData.isEditor };
-});
-
-export const logoutUser = createAsyncThunk('user/logoutUser', async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
-});
+// Асинхронный thunk для выхода пользователя
+export const logoutUser = createAsyncThunk('user/logoutUser', logoutUserApi);
 
 const userSlice = createSlice({
   name: 'user',
@@ -61,7 +19,7 @@ const userSlice = createSlice({
     user: null,
     authStatus: 'idle',
     error: null
-},
+  },
   reducers: {
     logout: (state) => {
       state.user = null;

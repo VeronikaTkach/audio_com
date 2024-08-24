@@ -1,22 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '../../../supabaseClient';
+import { fetchYearsApi } from '../../api';
 
-export const fetchYears = createAsyncThunk('years/fetchYears', async () => {
-  const { data, error } = await supabase
-    .from('albums')
-    .select('release_date');
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  // Извлекаем уникальные годы из даты выпуска альбома
-  const years = Array.from(new Set(data.map(album => album.release_date.split('-')[0])))
-    .sort()
-    .map(year => ({ value: year, label: year }));
-
-  return years;
-});
+// Асинхронный thunk для получения годов
+export const fetchYears = createAsyncThunk('years/fetchYears', fetchYearsApi);
 
 const yearsSlice = createSlice({
   name: 'years',

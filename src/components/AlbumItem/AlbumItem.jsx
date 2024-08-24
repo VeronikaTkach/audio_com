@@ -35,7 +35,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
   const handleAddToFavorites = async () => {
     if (user) {
       if (isFavorite) {
-        toast.success('Альбом уже добавлен в избранное!');
+        toast.success('The album has already been added to your favorites!');
         return;
       }
 
@@ -46,7 +46,6 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         .single();
 
       if (albumError) {
-        console.error('Ошибка при получении информации об альбоме:', albumError);
         return;
       }
 
@@ -61,10 +60,10 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         }]);
 
       if (error) {
-        console.error('Ошибка при добавлении в избранное:', error);
+        console.error('Error adding to favorites:', error);
       } else {
         setIsFavorite(true);
-        toast.success('Добавлено в избранное!');
+        toast.success('The album has already been added to your favorites!');
       }
     }
   };
@@ -72,7 +71,7 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
   return (
     <div className={s.album__item} onClick={() => onClick(album.id)}>
       <div className={s.album__info}>
-        <Suspense fallback={<img src={defaultCover} alt="Обложка по умолчанию" className={s.album__image} />}>
+        <Suspense fallback={<img src={defaultCover} alt="Default cover" className={s.album__image} />}>
           <AlbumImage src={album.image} alt={`${album.title} cover`} />
         </Suspense>
       </div>
@@ -92,12 +91,12 @@ export const AlbumItem = ({ album, onClick, onEdit, onDelete, isEditor }) => {
         {isEditor && (
           <div className={s.album__actions}>
             <Button 
-              label="Редактировать" 
+              label="Edit" 
               onClick={(e) => { e.stopPropagation(); onEdit(album.id); }} 
               className={s.album__button} 
             />
             <Button 
-              label="Удалить" 
+              label="Delete" 
               onClick={(e) => { e.stopPropagation(); onDelete(album.id); }} 
               className={s.album__button} 
             />
