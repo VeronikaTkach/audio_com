@@ -12,6 +12,7 @@ export const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
+  const authStatus = useSelector((state) => state.user.authStatus);
 
   useEffect(() => {
     dispatch(getUser());
@@ -23,6 +24,7 @@ export const Header = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    navigate('/catalog')
   };
 
   const handleFavoritesClick = () => {
@@ -39,8 +41,6 @@ export const Header = () => {
         <LinkLikeButton label="Catalog" to="/catalog" />
         <ThemeToggle />
       </div>
-
-      {/* Подключаем BurgerMenu */}
       <BurgerMenu
         user={user}
         handleNewAlbumClick={handleNewAlbumClick}
@@ -48,8 +48,6 @@ export const Header = () => {
         handleLogout={handleLogout}
         handleAuthClick={handleAuthClick}
       />
-
-      {/* Regular Header Actions for screens wider than 770px */}
       <div className={`${s.header__info} ${s.desktopOnly}`}>
         {user ? (
           <>

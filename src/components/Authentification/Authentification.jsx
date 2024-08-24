@@ -37,7 +37,6 @@ export const Authentification = ({ onClose }) => {
         }
       }
     } catch (error) {
-      console.error('Ошибка при аутентификации пользователя:', error);
       if (isRegister && error.message.includes('23505')) {
         setCustomError('User already exists');
       } else {
