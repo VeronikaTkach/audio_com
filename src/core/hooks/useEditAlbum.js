@@ -9,6 +9,8 @@ export const useEditAlbum = () => {
   const [initialAlbum, setInitialAlbum] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
 
   useEffect(() => {
     const fetchAlbumData = async (id) => {
@@ -38,11 +40,21 @@ export const useEditAlbum = () => {
     error: formError,
     imageFile,
     fileName,
-    handleInputChange,
-    handleImageChange,
+    handleInputChange: formHandleInputChange,
+    handleImageChange: formHandleImageChange,
     handleSaveChanges,
     originalAlbum,
   } = useAlbumForm(initialAlbum, 'edit');
+
+  const handleInputChange = (e) => {
+    setUnsavedChanges(true);
+    formHandleInputChange(e);
+  };
+
+  const handleImageChange = (e) => {
+    setUnsavedChanges(true);
+    formHandleImageChange(e);
+  };
 
   const handleSave = async (album, genreIds, formatIds) => {
     const { error: updateError } = await supabase
@@ -68,13 +80,28 @@ export const useEditAlbum = () => {
       )
     );
 
+    setUnsavedChanges(false);
     navigate(`/album/${albumId}`);
   };
 
   const handleSaveChangesWrapper = () => handleSaveChanges(handleSave);
 
   const handleCancel = () => {
+    if (unsavedChanges) {
+      setShowConfirmCancel(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleConfirmCancel = () => {
+    setShowConfirmCancel(false);
+    setUnsavedChanges(false);
     navigate(-1);
+  };
+
+  const handleStay = () => {
+    setShowConfirmCancel(false);
   };
 
   return {
@@ -88,5 +115,8 @@ export const useEditAlbum = () => {
     handleImageChange,
     handleSaveChanges: handleSaveChangesWrapper,
     handleCancel,
+    showConfirmCancel,
+    handleConfirmCancel,
+    handleStay,
   };
 };
