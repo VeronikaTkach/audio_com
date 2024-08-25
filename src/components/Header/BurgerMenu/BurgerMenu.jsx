@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '../../ui/Button';
 import ThemeToggle from '../../../assets/styles/themes/ThemeToggle';
 
 const BurgerIcon = styled.div`
@@ -11,7 +10,7 @@ const BurgerIcon = styled.div`
     width: 30px;
     height: 30px;
     position: relative;
-    z-index: 2000;
+    z-index: 1000;
   }
   & div {
     width: 30px;
