@@ -3,15 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAlbums, setCurrentPage, resetAlbums } from '../../core/store/albumsSlice';
 import { debounce } from 'lodash';
 
-export const useFetchAlbums = (searchTerm, selectedGenre, selectedYear, selectedFormats) => {
+export const useFetchAlbums = () => {
   const dispatch = useDispatch();
   const currentPage = useSelector(state => state.albums.currentPage);
   const albumsPerPage = useSelector(state => state.albums.albumsPerPage);
   const status = useSelector(state => state.albums.status);
   const hasMoreAlbums = useSelector(state => state.albums.hasMoreAlbums);
 
+  // Мемоизируем debounced функцию для избежания создания новой функции на каждом рендере
   const debouncedFetchAlbums = useCallback(
     debounce((searchTerm, genre, year, formats) => {
+      console.log('Fetching albums with params:', { searchTerm, genre, year, formats });
       dispatch(resetAlbums());
       dispatch(fetchAlbums({ 
         page: 1, 
@@ -26,10 +28,10 @@ export const useFetchAlbums = (searchTerm, selectedGenre, selectedYear, selected
   );
 
   useEffect(() => {
-    dispatch(resetAlbums());
-    dispatch(setCurrentPage(1));
-    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
-  }, [dispatch, debouncedFetchAlbums, searchTerm, selectedGenre, selectedYear, selectedFormats]);
+    return () => {
+      debouncedFetchAlbums.cancel();
+    };
+  }, [debouncedFetchAlbums]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,10 +40,10 @@ export const useFetchAlbums = (searchTerm, selectedGenre, selectedYear, selected
         dispatch(fetchAlbums({ 
           page: currentPage + 1, 
           perPage: albumsPerPage, 
-          searchTerm, 
-          genre: selectedGenre?.value, 
-          year: selectedYear?.value, 
-          formats: selectedFormats.map(f => f.value)
+          searchTerm: '',
+          genre: null, 
+          year: null, 
+          formats: []
         }));
       }
     };
@@ -49,7 +51,7 @@ export const useFetchAlbums = (searchTerm, selectedGenre, selectedYear, selected
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [dispatch, status, currentPage, albumsPerPage, searchTerm, selectedGenre, selectedYear, selectedFormats, hasMoreAlbums]);
+  }, [dispatch, status, currentPage, albumsPerPage, hasMoreAlbums]);
 
   return debouncedFetchAlbums;
 };

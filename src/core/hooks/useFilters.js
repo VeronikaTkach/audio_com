@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { setCurrentPage } from '../../core/store/albumsSlice';
 
@@ -8,31 +8,32 @@ export const useFilters = (debouncedFetchAlbums, searchTerm) => {
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedFormats, setSelectedFormats] = useState([]);
 
-  const handleGenreChange = (selectedOption) => {
+  // Используем useCallback для мемоизации функций и предотвращения бесконечных циклов рендеров
+  const handleGenreChange = useCallback((selectedOption) => {
     setSelectedGenre(selectedOption);
     dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedOption?.value, selectedYear?.value, selectedFormats.map(f => f.value));
-  };
+  }, [dispatch, searchTerm, selectedYear, selectedFormats, debouncedFetchAlbums]);
 
-  const handleYearChange = (selectedOption) => {
+  const handleYearChange = useCallback((selectedOption) => {
     setSelectedYear(selectedOption);
     dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedOption?.value, selectedFormats.map(f => f.value));
-  };
+  }, [dispatch, searchTerm, selectedGenre, selectedFormats, debouncedFetchAlbums]);
 
-  const handleFormatChange = (selectedOptions) => {
+  const handleFormatChange = useCallback((selectedOptions) => {
     setSelectedFormats(selectedOptions || []);
     dispatch(setCurrentPage(1));
     debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, (selectedOptions || []).map(f => f.value));
-  };
+  }, [dispatch, searchTerm, selectedGenre, selectedYear, debouncedFetchAlbums]);
 
-  const resetAllFilters = () => {
+  const resetAllFilters = useCallback(() => {
     setSelectedGenre(null);
     setSelectedYear(null);
     setSelectedFormats([]);
     dispatch(setCurrentPage(1));
     debouncedFetchAlbums('', null, null, []);
-  };
+  }, [dispatch, debouncedFetchAlbums]);
 
   return {
     selectedGenre,

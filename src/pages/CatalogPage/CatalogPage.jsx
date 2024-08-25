@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setSearchTerm } from '../../core/store/albumsSlice';
@@ -20,6 +20,10 @@ export const CatalogPage = () => {
   const user = useSelector(state => state.user.user);
   const [showFiltersPopup, setShowFiltersPopup] = useState(false);
 
+  // Получаем debouncedFetchAlbums из useFetchAlbums
+  const debouncedFetchAlbums = useFetchAlbums();
+
+  // Передаем debouncedFetchAlbums в useFilters
   const {
     selectedGenre,
     selectedYear,
@@ -28,9 +32,7 @@ export const CatalogPage = () => {
     handleYearChange,
     handleFormatChange,
     resetAllFilters,
-  } = useFilters();
-
-  const debouncedFetchAlbums = useFetchAlbums(searchTerm, selectedGenre, selectedYear, selectedFormats);
+  } = useFilters(debouncedFetchAlbums, searchTerm);
 
   const {
     selectedAlbumId,
@@ -40,22 +42,27 @@ export const CatalogPage = () => {
     handleCancelDelete,
   } = useDeleteAlbum();
 
-  const handleSearch = (term) => {
+  useEffect(() => {
+    // Вызов функции для первоначальной загрузки альбомов
+    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
+  }, [searchTerm, selectedGenre, selectedYear, selectedFormats, debouncedFetchAlbums]);
+
+  const handleSearch = useCallback((term) => {
     dispatch(setSearchTerm(term));
     debouncedFetchAlbums(term, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
-  };
+  }, [dispatch, debouncedFetchAlbums, selectedGenre, selectedYear, selectedFormats]);
 
-  const handleAlbumClick = (id) => {
+  const handleAlbumClick = useCallback((id) => {
     navigate(`/album/${id}`);
-  };
+  }, [navigate]);
 
-  const handleEditClick = (id) => {
+  const handleEditClick = useCallback((id) => {
     navigate(`/album/edit/${id}`);
-  };
+  }, [navigate]);
 
-  const toggleFiltersPopup = () => {
+  const toggleFiltersPopup = useCallback(() => {
     setShowFiltersPopup(prev => !prev);
-  };
+  }, []);
 
   return (
     <div className={s.container}>
