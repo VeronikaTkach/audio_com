@@ -29,7 +29,9 @@ const albumsSlice = createSlice({
     resetAlbums(state) {
       state.items = [];
       state.status = 'idle';
+      state.currentPage = 1;
       state.hasMoreAlbums = true;
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -43,12 +45,22 @@ const albumsSlice = createSlice({
           state.items = action.payload;
         } else {
           state.items = [...state.items, ...action.payload];
-          state.hasMoreAlbums = action.payload.length === state.albumsPerPage;
+        }
+
+        // Логика определения, есть ли еще альбомы
+        console.log('Payload length:', action.payload.length);
+        console.log('Albums per page:', state.albumsPerPage);
+
+        if (action.payload.length < state.albumsPerPage) {
+          state.hasMoreAlbums = false;
+        } else {
+          state.hasMoreAlbums = true;
         }
       })
       .addCase(fetchAlbums.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
+        state.hasMoreAlbums = false; // Устанавливаем в false, так как запрос не удался
       });
   }
 });

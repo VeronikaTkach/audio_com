@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { setSearchTerm } from '../../core/store/albumsSlice';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { setSearchTerm, resetAlbums, fetchAlbums } from '../../core/store/albumsSlice';
 import { SearchInput } from '../../components/ui/SearchInput';
 import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { Filters } from '../../components/ui/Filters';
@@ -15,6 +15,7 @@ import { useDeleteAlbum } from '../../core/hooks/useDeleteAlbum';
 export const CatalogPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const albums = useSelector(state => state.albums.items);
   const searchTerm = useSelector(state => state.albums.searchTerm);
   const user = useSelector(state => state.user.user);
@@ -42,10 +43,14 @@ export const CatalogPage = () => {
     handleCancelDelete,
   } = useDeleteAlbum();
 
+  // Сброс альбомов и загрузка новых при изменении пути
   useEffect(() => {
-    // Вызов функции для первоначальной загрузки альбомов
-    debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
-  }, [searchTerm, selectedGenre, selectedYear, selectedFormats, debouncedFetchAlbums]);
+    if (location.pathname === '/catalog') {
+      console.log('Navigated to /catalog. Resetting albums and fetching new ones.');
+      dispatch(resetAlbums());  // Сбрасываем состояние альбомов
+      debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
+    }
+  }, [location.pathname, dispatch, debouncedFetchAlbums, searchTerm, selectedGenre, selectedYear, selectedFormats]);
 
   const handleSearch = useCallback((term) => {
     dispatch(setSearchTerm(term));

@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAlbums, setCurrentPage, resetAlbums } from '../../core/store/albumsSlice';
+import { fetchAlbums, setCurrentPage } from '../../core/store/albumsSlice';
 import { debounce } from 'lodash';
 
 export const useFetchAlbums = () => {
@@ -14,7 +14,6 @@ export const useFetchAlbums = () => {
   const debouncedFetchAlbums = useCallback(
     debounce((searchTerm, genre, year, formats) => {
       console.log('Fetching albums with params:', { searchTerm, genre, year, formats });
-      dispatch(resetAlbums());
       dispatch(fetchAlbums({ 
         page: 1, 
         perPage: albumsPerPage, 
@@ -35,12 +34,19 @@ export const useFetchAlbums = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      console.log('Scroll event triggered');
+      console.log('Window innerHeight + scrollY:', window.innerHeight + window.scrollY);
+      console.log('Document body offsetHeight:', document.body.offsetHeight);
+      console.log('Albums loading status:', status);
+      console.log('Has more albums:', hasMoreAlbums);
+  
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && status !== 'loading' && hasMoreAlbums) {
+        console.log('Fetching more albums on scroll...');
         dispatch(setCurrentPage(currentPage + 1));
         dispatch(fetchAlbums({ 
           page: currentPage + 1, 
           perPage: albumsPerPage, 
-          searchTerm: '',
+          searchTerm: '', // Здесь можно передать текущие значения фильтров
           genre: null, 
           year: null, 
           formats: []
