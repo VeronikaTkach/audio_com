@@ -9,3 +9,10 @@ export {
   fetchYearsApi, 
   fetchFormatsApi 
 } from './api';
+
+export { 
+  fetchAlbumApi, 
+  deleteAlbumApi,
+  checkIfFavoriteApi,
+  addAlbumToFavoritesApi
+} from './apiAlbumPage';

@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getUser } from '../../core/store/userSlice';
-import { supabase } from '../../../supabaseClient';
-import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import { deleteAlbum } from '../../core/store/albumsSlice';
+import { fetchAlbumApi, deleteAlbumApi, checkIfFavoriteApi, addAlbumToFavoritesApi } from '../../api';
+import { ConfirmDeleteModal } from '../../components/ui/ConfirmDeleteModal';
 import defaultCover from '../../assets/photo.png'
 import s from './styles.module.scss';
 
@@ -28,24 +28,14 @@ export const AlbumPage = () => {
 
   useEffect(() => {
     const fetchAlbum = async () => {
-      const { data, error } = await supabase
-        .from('albums')
-        .select('*')
-        .eq('id', albumId)
-        .maybeSingle();
-
-      if (error) {
-        throw new Error('Error fetching album');
-      } else {
-        if (typeof data.genre === 'string') {
-          data.genre = JSON.parse(data.genre);
-        }
-        if (typeof data.format === 'string') {
-          data.format = JSON.parse(data.format);
-        }
-        setAlbum(data);
+      try {
+        const albumData = await fetchAlbumApi(albumId);
+        setAlbum(albumData);
         setLoadingState('loaded');
-        console.log("Fetched album:", data);
+        console.log("Fetched album:", albumData);
+      } catch (error) {
+        console.error(error);
+        setLoadingState('error');
       }
     };
 
@@ -57,16 +47,8 @@ export const AlbumPage = () => {
   useEffect(() => {
     const checkIfFavorite = async () => {
       if (user && albumId) {
-        const { data } = await supabase
-          .from('favorites')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('album_id', albumId)
-          .maybeSingle();
-
-        if (data) {
-          setIsFavorite(true);
-        }
+        const isFav = await checkIfFavoriteApi(user.id, albumId);
+        setIsFavorite(isFav);
       }
     };
 
@@ -80,50 +62,18 @@ export const AlbumPage = () => {
 
   const handleConfirmDelete = async () => {
     try {
-        await supabase
-            .from('format_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
+      await deleteAlbumApi(selectedAlbumId);
+      dispatch(deleteAlbum(selectedAlbumId));
+      setShowConfirmDelete(false);
+      setSelectedAlbumId(null);
+      setLoadingState('deleted');
 
-        await supabase
-            .from('genre_album')
-            .delete()
-            .eq('album_id', selectedAlbumId);
-
-        const { data: albumData, error: albumError } = await supabase
-            .from('albums')
-            .delete()
-            .eq('id', selectedAlbumId)
-            .select()
-            .maybeSingle();
-
-        if (albumError) {
-            throw new Error(albumError.message);
-        }
-
-        if (albumData.image) {
-            const coverPath = `covers/${albumData.artist}/${albumData.title}`;
-            const { error: storageError } = await supabase.storage
-                .from('album_covers')
-                .remove([coverPath]);
-
-            if (storageError) {
-                throw new Error(storageError.message);
-            }
-        }
-
-        dispatch(deleteAlbum(selectedAlbumId));
-        setShowConfirmDelete(false);
-        setSelectedAlbumId(null);
-        setLoadingState('deleted');
-
-        setTimeout(() => {
-            toast.success('Album has been successfully deleted!');
-            navigate('/catalog');
-        }, 100);
-
+      setTimeout(() => {
+        toast.success('Album has been successfully deleted!');
+        navigate('/catalog');
+      }, 100);
     } catch (error) {
-        console.error('Error deleting album:', error.message);
+      console.error('Error deleting album:', error.message);
     }
   };
 
@@ -138,32 +88,12 @@ export const AlbumPage = () => {
 
   const handleAddToFavorites = async () => {
     if (user) {
-      const { data: albumData, error: albumError } = await supabase
-        .from('albums')
-        .select('title, artist, image')
-        .eq('id', albumId)
-        .maybeSingle();
-
-      if (albumError) {
-        console.error('Error fetching album details:', albumError);
-        return;
-      }
-
-      const { error } = await supabase
-        .from('favorites')
-        .insert([{ 
-          user_id: user.id, 
-          album_id: albumId,
-          title: albumData.title,
-          artist: albumData.artist,
-          image: albumData.image
-        }]);
-
-      if (error) {
-        console.error('Error adding to favorites:', error);
-      } else {
+      try {
+        await addAlbumToFavoritesApi(user, albumId);
         setIsFavorite(true);
         toast.success('Added to favorites!');
+      } catch (error) {
+        console.error('Error adding to favorites:', error);
       }
     }
   };
@@ -204,4 +134,3 @@ export const AlbumPage = () => {
     </div>
   );
 };
-
