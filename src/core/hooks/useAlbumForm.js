@@ -76,8 +76,10 @@ export const useAlbumForm = (initialAlbum = null, mode = 'add') => {
       if (imageFile) {
         album.image = await uploadImageToSupabase(album.artist, album.title, imageFile);
       }
+      console.log('Calling handleSave with:', album, genreIds, formatIds); // Логируем перед вызовом handleSave
 
       await customSaveCallback(album, genreIds, formatIds);
+      
       const updatedGenres = await fetchGenresFromSupabase();
       setGenres(updatedGenres.map((genre) => ({ value: genre.genre, label: genre.genre })));
       toast.success('Album saved successfully!');
@@ -85,7 +87,7 @@ export const useAlbumForm = (initialAlbum = null, mode = 'add') => {
       setError('Error saving album: ' + err.message);
       console.error(err);
     }
-  };
+  };  
 
   return {
     album,

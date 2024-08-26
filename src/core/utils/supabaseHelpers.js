@@ -22,41 +22,52 @@ export const checkIfSuchAlbumExists = async (title, artist) => {
 // Сохранение жанров
 export const saveGenresToSupabase = async (genres) => {
   const genreIds = [];
+
   for (const genre of genres) {
     const trimmedGenre = genre.trim();
 
-    let { data, error } = await supabase
-      .from('genre')
-      .select('genre_id')
-      .eq('genre', trimmedGenre)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error checking genre:', error.message);
-      throw new Error('Error checking genre: ' + error.message);
-    }
-
-    if (data) {
-      console.log('Genre already exists:', data);
-      genreIds.push(data.genre_id);
-    } else {
-      console.log('Inserting new genre:', trimmedGenre);
-
-      const { data: newGenre, error: genreError } = await supabase
+    try {
+      // Попытка найти существующий жанр
+      let { data, error } = await supabase
         .from('genre')
-        .insert({ genre: trimmedGenre })
-        .select()
+        .select('genre_id')
+        .eq('genre', trimmedGenre)
         .single();
 
-      if (genreError) {
-        console.error('Error adding genre:', genreError.message);
-        throw new Error('Error adding genre: ' + genreError.message);
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking genre:', error.message);
+        throw new Error('Error checking genre: ' + error.message);
       }
 
-      console.log('New genre added:', newGenre);
-      genreIds.push(newGenre.genre_id);
+      if (data) {
+        // Жанр уже существует, используем его ID
+        console.log('Genre already exists:', data);
+        genreIds.push(data.genre_id);
+      } else {
+        // Жанр не найден, добавляем его
+        console.log('Inserting new genre:', trimmedGenre);
+
+        const { data: newGenre, error: genreError } = await supabase
+          .from('genre')
+          .insert({ genre: trimmedGenre })
+          .select('genre_id')
+          .single();
+
+        if (genreError) {
+          console.error('Error adding genre:', genreError.message);
+          throw new Error('Error adding genre: ' + genreError.message);
+        }
+
+        console.log('New genre added:', newGenre);
+        genreIds.push(newGenre.genre_id);
+      }
+    } catch (error) {
+      console.error('Unexpected error occurred while saving genre:', error.message);
+      throw new Error('Unexpected error occurred while saving genre: ' + error.message);
     }
   }
+  
+  console.log('Genre IDs to link with album:', genreIds); // Логирование идентификаторов жанров
   return genreIds;
 };
 

@@ -24,27 +24,40 @@ export const useAddNewAlbum = () => {
     if (await checkIfSuchAlbumExists(album.title, album.artist)) {
       throw new Error('Such album of such artist exists already');
     }
-
+  
     const { data: createdAlbum, error: albumError } = await supabase
       .from('albums')
       .insert(album)
       .select()
       .single();
-
+  
     if (albumError) throw new Error('Error creating album: ' + albumError.message);
+  
+    console.log('Created album:', createdAlbum); // Логирование созданного альбома
 
-    await Promise.all(
-      genreIds.map((genreId) =>
-        supabase.from('genre_album').insert({ album_id: createdAlbum.id, genre_id: genreId })
-      )
+    // Привязка жанров к альбому
+  if (genreIds.length > 0) {
+    const genrePromises = genreIds.map((genreId) => 
+      supabase.from('genre_album').insert({ album_id: createdAlbum.id, genre_id: genreId })
     );
 
+    try {
+      await Promise.all(genrePromises);
+      console.log('Genres linked to album successfully');
+    } catch (insertError) {
+      console.error('Error linking genres to album:', insertError.message);
+    }
+  } else {
+    console.log('No genres to link to album.');
+  }
+  
+    // Привязка форматов к альбому
     await Promise.all(
       formatIds.map((formatId) =>
         supabase.from('format_album').insert({ album_id: createdAlbum.id, format_id: formatId })
       )
     );
-
+  
     dispatch(fetchAlbums({ page: 1, perPage: 10 })).then(() => {
       navigate('/catalog');
     });
