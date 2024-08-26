@@ -48,9 +48,6 @@ const albumsSlice = createSlice({
         }
 
         // Логика определения, есть ли еще альбомы
-        console.log('Payload length:', action.payload.length);
-        console.log('Albums per page:', state.albumsPerPage);
-
         if (action.payload.length < state.albumsPerPage) {
           state.hasMoreAlbums = false;
         } else {
@@ -60,7 +57,7 @@ const albumsSlice = createSlice({
       .addCase(fetchAlbums.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
-        state.hasMoreAlbums = false; // Устанавливаем в false, так как запрос не удался
+        state.hasMoreAlbums = false;
       });
   }
 });

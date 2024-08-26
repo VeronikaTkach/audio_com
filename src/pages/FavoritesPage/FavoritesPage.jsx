@@ -65,9 +65,7 @@ export const FavoritesPage = () => {
       if (error) {
         console.error('Error deleting from favorites:', error);
       } else {
-        // Удаление альбома из состояния favorites
         setFavorites(favorites.filter(fav => fav.id !== deleteItemId));
-        // Проверка на успешное удаление из Supabase
         const { data: checkData, error: checkError } = await supabase
           .from('favorites')
           .select('*')

@@ -71,7 +71,7 @@ export const BurgerMenu = ({ user, handleNewAlbumClick, handleFavoritesClick, ha
 
   const handleButtonClick = (action) => {
     action();
-    setMenuOpen(false); // Закрытие панели после клика
+    setMenuOpen(false);
   };
 
   return (

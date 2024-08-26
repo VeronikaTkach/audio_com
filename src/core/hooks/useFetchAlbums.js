@@ -10,7 +10,6 @@ export const useFetchAlbums = () => {
   const status = useSelector(state => state.albums.status);
   const hasMoreAlbums = useSelector(state => state.albums.hasMoreAlbums);
 
-  // Мемоизируем debounced функцию для избежания создания новой функции на каждом рендере
   const debouncedFetchAlbums = useCallback(
     debounce((searchTerm, genre, year, formats) => {
       console.log('Fetching albums with params:', { searchTerm, genre, year, formats });
@@ -46,7 +45,7 @@ export const useFetchAlbums = () => {
         dispatch(fetchAlbums({ 
           page: currentPage + 1, 
           perPage: albumsPerPage, 
-          searchTerm: '', // Здесь можно передать текущие значения фильтров
+          searchTerm: '',
           genre: null, 
           year: null, 
           formats: []

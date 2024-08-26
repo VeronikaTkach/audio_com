@@ -21,10 +21,8 @@ export const CatalogPage = () => {
   const user = useSelector(state => state.user.user);
   const [showFiltersPopup, setShowFiltersPopup] = useState(false);
 
-  // Получаем debouncedFetchAlbums из useFetchAlbums
   const debouncedFetchAlbums = useFetchAlbums();
 
-  // Передаем debouncedFetchAlbums в useFilters
   const {
     selectedGenre,
     selectedYear,
@@ -43,11 +41,10 @@ export const CatalogPage = () => {
     handleCancelDelete,
   } = useDeleteAlbum();
 
-  // Сброс альбомов и загрузка новых при изменении пути
   useEffect(() => {
     if (location.pathname === '/catalog') {
       console.log('Navigated to /catalog. Resetting albums and fetching new ones.');
-      dispatch(resetAlbums());  // Сбрасываем состояние альбомов
+      dispatch(resetAlbums());
       debouncedFetchAlbums(searchTerm, selectedGenre?.value, selectedYear?.value, selectedFormats.map(f => f.value));
     }
   }, [location.pathname, dispatch, debouncedFetchAlbums, searchTerm, selectedGenre, selectedYear, selectedFormats]);

@@ -1,4 +1,3 @@
-// src/components/ui/AlbumImage.js
 import React, { useState } from 'react';
 import defaultCover from '../../../assets/photo.png';
 import s from './styles.module.scss';
